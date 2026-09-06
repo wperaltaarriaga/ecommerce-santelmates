@@ -6,8 +6,9 @@ import './App.css'
 function App() {
   const greeting = "Mates para acompañar cada momento"
 
-  const [categoriaActiva, setCategoriaActiva] = useState('Todos')
+  const [categoriaActiva, setCategoriaActiva] = useState(null)
   const [busqueda, setBusqueda] = useState('')
+
 
   return (
     <>

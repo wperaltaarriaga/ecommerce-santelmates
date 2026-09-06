@@ -6,8 +6,8 @@ function ItemListContainer({ greeting, categoriaActiva, busqueda }) {
   const { products, loading, error } = useProducts(import.meta.env.VITE_API_URL)
 
   const itemsFiltrados = products
-    .filter((item) => categoriaActiva === 'Todos' || item.categoria === categoriaActiva)
-    .filter((item) => item.nombre.toLowerCase().includes(busqueda.toLowerCase()))
+  .filter((item) => categoriaActiva === null || item.categoria === categoriaActiva)
+  .filter((item) => item.nombre.toLowerCase().includes(busqueda.toLowerCase()))
 
   return (
     <>

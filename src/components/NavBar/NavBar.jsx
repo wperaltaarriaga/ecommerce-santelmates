@@ -1,7 +1,7 @@
 import styles from './NavBar.module.css'
 import CartWidget from '../CartWidget/CartWidget'
 
-const categorias = ['Todos', 'Mates', 'Bombillas', 'Despolvilladores', 'Ofertas']
+const categorias = ['Mates', 'Bombillas', 'Despolvilladores']
 
 function NavBar({ categoriaActiva, setCategoriaActiva, busqueda, setBusqueda }) {
   return (
