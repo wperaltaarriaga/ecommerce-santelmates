@@ -1,19 +1,11 @@
 import { useState } from "react"
 import styles from './ProductCard.module.css'
+import ItemCount from '../ItemCount/ItemCount'
 
 function ProductCard({ item }) {
   const { nombre, precio, imagen, categoria } = item
 
-  const [cantidad, setCantidad] = useState(1)
   const [esFavorito, setEsFavorito] = useState(false)
-
-  const sumarCantidad = () => {
-    setCantidad(prev => prev + 1)
-  }
-
-  const restarCantidad = () => {
-    setCantidad(prev => (prev > 0 ? prev - 1 : 0))
-  }
 
   const toggleFavorite = () => {
     setEsFavorito(prev => !prev)
@@ -36,11 +28,7 @@ function ProductCard({ item }) {
         <h3 className={styles.title}>{nombre}</h3>
         <p className={styles.price}>${precio.toLocaleString('es-AR')}</p>
 
-        <div className={styles.btns}>
-          <button className={styles.button} onClick={restarCantidad}>-</button>
-          <span className={styles.span}>{cantidad}</span>
-          <button className={styles.button} onClick={sumarCantidad}>+</button>
-        </div>
+        <ItemCount />
       </div>
     </article>
   )

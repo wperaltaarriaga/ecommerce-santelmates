@@ -1,12 +1,13 @@
 # Santelmates 🧉
 
-E-commerce de mates artesanales, desarrollado con **React + Vite** como práctica de composición de componentes, manejo de estado (`useState`), efectos (`useEffect`) y comunicación vía props.
+E-commerce de mates artesanales, desarrollado con **React + Vite** como práctica de composición de componentes, manejo de estado (`useState`), efectos (`useEffect`), consumo de APIs externas con `fetch` y comunicación vía props.
 
 ## Stack
 
 - React
 - Vite
 - CSS Modules
+- Fake Store API (https://fakestoreapi.com)
 
 ## Cómo correr el proyecto
 
@@ -16,6 +17,17 @@ npm run dev
 ```
 
 La app queda disponible en `http://localhost:5173`.
+
+### Variables de entorno
+
+La URL de la API se lee desde una variable de entorno, para poder cambiarla sin tocar el código:
+
+```
+# .env
+VITE_API_URL=https://fakestoreapi.com/products
+```
+
+Creá un archivo `.env` en la raíz del proyecto (al lado de `package.json`) con esa línea. Vite expone automáticamente cualquier variable que empiece con `VITE_` a través de `import.meta.env`.
 
 ## Estructura del proyecto
 
@@ -44,47 +56,48 @@ src/
 public/
   hero/
     hero-mate.jpg
-  mate1.jpg
-  despolvilador.jpg
+.env
 ```
 
 ## Componentes y manejo de estado
 
+### `App`
+Es el ancestro común que centraliza el estado compartido entre `NavBar` e `ItemListContainer`:
+
+- `categoriaActiva` (string): categoría seleccionada en el filtro del navbar.
+- `busqueda` (string): texto ingresado en el buscador.
+
+Ambos estados se pasan por props hacia abajo (comunicación unidireccional padre → hijo) para que `NavBar` pueda modificarlos y `ItemListContainer` pueda usarlos para filtrar los productos.
+
 ### `NavBar`
-Contiene el branding de la tienda, las categorías de productos (mapeadas desde un array) presentadas como un selector tipo píldora, y el `CartWidget`.
-
-```jsx
-const categorias = ['Mates', 'Bombillas', 'Despolvilladores', 'Ofertas']
-```
-
-Maneja un estado local `categoriaActiva` (`useState`) para resaltar visualmente la categoría seleccionada.
+Contiene el branding, las categorías (mapeadas desde un array, con selector tipo píldora), un input de búsqueda y el `CartWidget`. No define su propio estado de filtro: lo recibe por props desde `App` (`categoriaActiva`, `setCategoriaActiva`, `busqueda`, `setBusqueda`).
 
 ### `CartWidget`
-Componente pequeño y reutilizable dentro de la `NavBar`. Muestra un ícono de carrito y un badge con la cantidad de ítems, recibida por prop (`cantidad`). Por ahora el valor está hardcodeado desde `NavBar` (`<CartWidget cantidad={3} />`); a futuro este número vendrá de un estado global del carrito.
+Muestra un ícono de carrito y un badge con la cantidad de ítems, recibida por prop (`cantidad`). Por ahora el valor está hardcodeado desde `NavBar`; a futuro vendrá de un estado global del carrito.
 
 ### `ItemListContainer`
-Componente contenedor de la sección principal. Recibe la prop `greeting` desde `App` y la muestra en el hero, demostrando la comunicación unidireccional **padre → hijo**:
+Componente contenedor de la sección principal. Recibe `greeting`, `categoriaActiva` y `busqueda` por props desde `App`.
 
-```jsx
-<ItemListContainer greeting="Mates para acompañar cada momento" />
-```
+**Consumo de la API (Fake Store API):**
 
-Además, gestiona la carga de productos simulando una petición a una API real:
+- **Estados:** `items` (array, inicia vacío), `isLoading` (booleano, `true` al montar) y `error` (string o `null`, inicia en `null`).
+- **`useEffect` con `fetch`:** dentro del efecto se define una función `async` (`fetchProductos`) que hace la petición a `https://fakestoreapi.com/products` — no se puede hacer el propio callback de `useEffect` `async`, porque React espera que devuelva `undefined` o una función de limpieza, no una `Promise`.
+- **Manejo de errores:** `fetch` no lanza una excepción automáticamente ante respuestas HTTP fallidas (404, 500, etc.) — solo falla ante errores de red. Por eso se verifica `response.ok` manualmente y, si es `false`, se fuerza un error con `throw new Error(...)`, que es capturado por el bloque `catch` y guardado en el estado `error`.
+- **`.json()` asincrónico:** la conversión de la respuesta a JSON (`response.json()`) también es una operación asincrónica y lleva su propio `await`.
+- **`finally`:** garantiza que `isLoading` pase a `false` tanto si la petición tuvo éxito como si falló, sin duplicar esa línea en el `try` y en el `catch`.
+- **Mapeo de datos:** la Fake Store API devuelve los campos `title`, `price`, `image` y `category` en inglés; se transforman a `nombre`, `precio`, `imagen` y `categoria` para mantener consistencia con el resto de los componentes ya construidos (`ProductCard`, `ItemList`).
+- **Array de dependencias `[]`:** el efecto se ejecuta una única vez al montar el componente, simulando la carga inicial de datos desde la API. Si se omitiera el array de dependencias, el efecto se dispararía en cada render; y como dentro de él se actualiza el estado (`setItems`/`setIsLoading`/`setError`), cada actualización generaría un nuevo render, que a su vez volvería a disparar el efecto — entrando en un bucle infinito de peticiones a la API.
 
-- **Estados:** `items` (array vacío inicial) y `loading` (booleano, `true` al montar).
-- **`useEffect`:** define un array de productos ficticios y usa `setTimeout` para simular 2 segundos de demora de red. Al cumplirse, actualiza `items` y pone `loading` en `false`.
-- **Array de dependencias `[]`:** se usa vacío a propósito, para que el efecto se ejecute una única vez al montar el componente, simulando la carga inicial de datos. Si se omitiera el array de dependencias, el efecto se volvería a ejecutar en cada render del componente —y como el propio efecto actualiza el estado (`setItems`/`setLoading`), cada actualización dispararía un nuevo render, que a su vez volvería a ejecutar el efecto, entrando en un bucle infinito de peticiones.
-- **Función de limpieza:** el efecto retorna `clearTimeout(timer)`, que cancela el timeout si el componente se desmonta antes de que termine, evitando actualizar el estado de un componente que ya no existe.
-- **Renderizado condicional:** mientras `loading` es `true`, se muestra "Cargando productos..."; cuando pasa a `false`, se renderiza `<ItemList items={items} />`.
+**Renderizado condicional:**
+- Si `isLoading` es `true` → "Cargando productos...".
+- Si hay `error` → mensaje de error en rojo.
+- Si no hay carga ni error, pero el filtro no encuentra resultados → "No se encontraron productos.".
+- En cualquier otro caso → se renderiza `<ItemList items={itemsFiltrados} />`.
+
+**Filtrado:** `itemsFiltrados` se calcula en cada render a partir de `items`, `categoriaActiva` y `busqueda` (filtro por categoría exacta + búsqueda por nombre, insensible a mayúsculas), sin necesidad de un nuevo `useEffect` ni de repetir el fetch.
 
 ### `ItemList`
-Recorre el array de productos con `.map()` y renderiza un `ProductCard` por cada uno, asignando la prop `key={item.id}` en el elemento retornado por el `.map()` (usando el `id` real del producto, nunca el índice del array).
-
-```jsx
-{items.map((item) => (
-  <ProductCard key={item.id} item={item} />
-))}
-```
+Recorre `items` con `.map()` y renderiza un `ProductCard` por cada uno, asignando `key={item.id}` en el elemento retornado por el `.map()` (usando el `id` real del producto de la API, nunca el índice del array).
 
 ### `ProductCard`
 Componente de presentación de cada producto. Recibe el objeto completo por prop (`item`) y desestructura sus campos:
@@ -93,20 +106,24 @@ Componente de presentación de cada producto. Recibe el objeto completo por prop
 const { nombre, precio, imagen, categoria } = item
 ```
 
-Cada producto tiene: `id`, `nombre`, `precio`, `categoria` e `imagen`.
-
 Maneja dos estados propios, independientes por cada instancia de la card:
 
-- **`cantidad`** (número, inicial `1`): se incrementa/decrementa con `sumarCantidad` / `restarCantidad`, ambas usando la forma funcional del setter (`setCantidad(prev => prev + 1)`) para evitar leer valores desactualizados. `restarCantidad` está validado para que nunca baje de `0`.
-- **`esFavorito`** (booleano, inicial `false`): se invierte con `toggleFavorite` usando `setEsFavorito(prev => !prev)`. El botón de favorito cambia de ícono (🤍 / ❤️) según el valor del estado, sin mutar directamente ninguna variable.
+- **`cantidad`** (número, inicial `1`): se incrementa/decrementa con `sumarCantidad` / `restarCantidad`, usando la forma funcional del setter (`setCantidad(prev => prev + 1)`). `restarCantidad` está validado para que nunca baje de `0`.
+- **`esFavorito`** (booleano, inicial `false`): se invierte con `toggleFavorite` usando `setEsFavorito(prev => !prev)`. El ícono cambia (🤍 / ❤️) según el valor del estado.
 
-## Datos de productos
+## Verificación manual del manejo de errores
 
-Por ahora los productos son un array ficticio dentro de `ItemListContainer`, con al menos 5 ítems y sin IDs duplicados. Las imágenes viven en `public/` (o se usan placeholders de `placehold.co` mientras no hay fotos propias).
+Para probar que la UI no se rompe si la API falla, se puede cambiar temporalmente la URL en `.env` a una ruta inexistente:
+
+```
+VITE_API_URL=https://fakestoreapi.com/ruta-que-no-existe
+```
+
+Al recargar, en vez de mostrar los productos debería verse el mensaje de error en rojo ("⚠️ Error al cargar productos: 404"), sin que la aplicación quede en blanco ni rompa. Después hay que volver a poner la URL correcta.
 
 ## Próximos pasos
 
-- Conectar `ItemListContainer` a una fuente de datos real (API o Firebase) para reemplazar el array ficticio.
-- Implementar rutas de navegación (React Router).
-- Filtrar productos por categoría desde la `NavBar`.
+- Implementar rutas de navegación (React Router), incluyendo vista de detalle por producto usando `https://fakestoreapi.com/products/:id`.
 - Convertir el `CartWidget` en un carrito funcional con estado global (Context API).
+- Agregar tests unitarios con Vitest + React Testing Library para el renderizado de componentes.
+- Debounce en el input de búsqueda para no filtrar en cada tecla presionada.

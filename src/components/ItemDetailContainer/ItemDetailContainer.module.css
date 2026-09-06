@@ -1,0 +1,19 @@
+.loadingText {
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  
+  .errorText {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e63946;
+    background-color: #ffe5e8;
+    border: 1px solid #ffb3ba;
+    border-radius: 8px;
+    padding: 16px 24px;
+    display: inline-block;
+    margin: 40px auto;
+    text-align: center;
+  }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import NavBar from './components/NavBar/NavBar'
-import ItemListContainer from './components/ItemListContainer/ItemListContainer'
+import ItemListContainer from './components/ItemListContainer/ItemListContainer.jsx'
+import ItemDetailContainer from './components/ItemDetailContainer/ItemDetailContainer.jsx'
 import './App.css'
 
 function App() {
@@ -9,9 +10,8 @@ function App() {
   const [categoriaActiva, setCategoriaActiva] = useState(null)
   const [busqueda, setBusqueda] = useState('')
 
-
   return (
-    <>
+    <>      
       <NavBar
         categoriaActiva={categoriaActiva}
         setCategoriaActiva={setCategoriaActiva}
@@ -23,6 +23,8 @@ function App() {
         categoriaActiva={categoriaActiva}
         busqueda={busqueda}
       />
+
+      <ItemDetailContainer productId={1} />
     </>
   )
 }
