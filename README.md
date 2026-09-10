@@ -1,13 +1,13 @@
 # Santelmates 🧉
 
-E-commerce de mates artesanales, desarrollado con **React + Vite** como práctica de composición de componentes, manejo de estado (`useState`), efectos (`useEffect`), custom hooks, consumo de APIs externas con `fetch`/promesas y comunicación vía props.
+E-commerce de mates artesanales, desarrollado con **React + Vite** como práctica de composición de componentes, manejo de estado (`useState`), efectos (`useEffect`), simulación de datos asíncronos con `Promise`, y navegación con **React Router**.
 
 ## Stack
 
 - React
 - Vite
+- React Router DOM
 - CSS Modules
-- Fake Store API (https://fakestoreapi.com)
 
 ## Cómo correr el proyecto
 
@@ -18,24 +18,16 @@ npm run dev
 
 La app queda disponible en `http://localhost:5173`.
 
-### Variables de entorno
-
-Creá un archivo `.env` en la raíz del proyecto (al lado de `package.json`) con:
-
-```
-VITE_API_URL=https://fakestoreapi.com/products
-VITE_API_URL_BASE=https://fakestoreapi.com
-```
-
-- `VITE_API_URL`: endpoint del listado completo de productos, usado por `useProducts`.
-- `VITE_API_URL_BASE`: base de la API, usada por `getProductById` para armar la URL de un producto puntual (`/products/{id}`).
-
-Vite expone automáticamente cualquier variable que empiece con `VITE_` a través de `import.meta.env`. Hay un `.env.example` con la misma estructura, sin datos sensibles, como referencia para quien clone el repo.
+No requiere ninguna API externa ni servidor adicional: los datos de productos se simulan localmente con un mock asíncrono (ver sección "Simulación de datos").
 
 ## Estructura del proyecto
 
 ```
 src/
+  mock/
+    asyncMock.js
+  services/
+    getProductById.js
   components/
     NavBar/
       NavBar.jsx
@@ -61,11 +53,10 @@ src/
     ItemDetail/
       ItemDetail.jsx
       ItemDetail.module.css
-  hooks/
-    useFetch.js
-    useProducts.js
-  services/
-    getProductById.js
+  pages/
+    Home.jsx
+    Home.module.css
+    NotFound.jsx
   App.jsx
   App.css
   main.jsx
@@ -73,89 +64,107 @@ src/
 public/
   hero/
     hero-mate.jpg
-.env
-.env.example
 ```
 
-## Componentes y manejo de estado
+## Simulación de datos asíncronos
+
+En lugar de consumir una API externa, el catálogo de productos vive en un **mock local** que simula el comportamiento de una petición de red real.
+
+### `src/mock/asyncMock.js`
+
+Contiene:
+
+- Un array `products` con 12 productos de ejemplo. Cada uno tiene las propiedades `id`, `name`, `price`, `category`, `img`, `stock` y `description`.
+- La función `getProducts()`, que retorna una `Promise`. Dentro de la promesa, un `setTimeout` de 1000ms simula la demora de una petición de red antes de resolver con el array completo de productos.
+
+```jsx
+export function getProducts() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(products)
+    }, 1000)
+  })
+}
+```
+
+### Consumo en `ItemListContainer`
+
+`ItemListContainer` define sus propios estados con `useState` (`items`, inicializado como array vacío, y `loading`, inicializado en `true`), y dentro de un `useEffect` con array de dependencias vacío (`[]`) llama a `getProducts()` de forma asincrónica:
+
+```jsx
+useEffect(() => {
+  const fetchItems = async () => {
+    const data = await getProducts()
+    setItems(data)
+    setLoading(false)
+  }
+  fetchItems()
+}, [])
+```
+
+El array de dependencias vacío garantiza que la carga simulada ocurra una única vez, al montar el componente. Si se omitiera, el efecto se dispararía en cada render y, como dentro de él se actualiza el estado, entraría en un bucle infinito.
+
+Mientras `loading` es `true`, se muestra "Cargando productos..."; una vez resuelta la promesa, se filtra el array (`itemsFiltrados`) según la categoría activa y el texto de búsqueda, y se renderiza `<ItemList items={itemsFiltrados} />`.
+
+### `src/services/getProductById.js`
+
+Función usada por `ItemDetailContainer` para obtener un producto puntual por su `id`. También retorna una `Promise`: internamente reutiliza `getProducts()` del mock, busca dentro del array con `.find(p => p.id === Number(productId))` (nunca por posición/índice) y resuelve con el producto encontrado, o rechaza con un error si no existe ningún producto con ese id.
+
+## Componentes
 
 ### `App`
-Ancestro común que centraliza el estado compartido entre `NavBar` e `ItemListContainer`:
+Envuelto por `BrowserRouter` (definido en `main.jsx`). Centraliza el estado compartido `categoriaActiva` y `busqueda`, que baja por props a `NavBar` (para modificarlos) e `ItemListContainer` (para filtrar con ellos). Define las rutas de la aplicación con `Routes`/`Route`:
 
-- `categoriaActiva` (string o `null`): categoría seleccionada en el filtro del navbar. `null` significa "sin filtro, mostrar todo".
-- `busqueda` (string): texto ingresado en el buscador.
-
-Ambos estados bajan por props (comunicación unidireccional padre → hijo) hacia `NavBar` (para modificarlos) y hacia `ItemListContainer` (para filtrar con ellos). También renderiza `ItemDetailContainer` con un `productId` de prueba, a la espera de conectarse con rutas dinámicas más adelante.
+| Ruta | Componente |
+|---|---|
+| `/` | `Home` |
+| `/productos` | `ItemListContainer` |
+| `/detalle/:id` | `ItemDetailContainer` |
+| `*` | `NotFound` (404) |
 
 ### `NavBar`
-Contiene el branding, las categorías reales de producto (Mates, Bombillas, Despolvilladores) mapeadas desde un array y mostradas como selector tipo píldora, un input de búsqueda y el `CartWidget`. Recibe todo su estado de filtro por props desde `App`.
+Presente en todas las páginas (se renderiza fuera de `<Routes>`, arriba). Contiene el branding, enlaces de navegación (`NavLink` a `/` y `/productos`, con estilo condicional según la ruta activa), las categorías de producto como filtro tipo píldora, un input de búsqueda y el `CartWidget`.
+
+### `Home`
+Página de bienvenida con hero de imagen de fondo, mostrada en la ruta `/`.
 
 ### `CartWidget`
-Muestra un ícono de carrito y un badge con la cantidad de ítems, recibida por prop (`cantidad`). Por ahora hardcodeado desde `NavBar`; a futuro vendrá de un estado global del carrito.
+Ícono de carrito con badge de cantidad (prop `cantidad`, hardcodeada por ahora).
 
 ### `ItemListContainer`
-Obtiene el listado completo de productos a través del custom hook `useProducts` y filtra el resultado según `categoriaActiva` y `busqueda` antes de pasarlo a `ItemList`. No hace fetch directamente ni maneja `useState`/`useEffect` propios para los datos — esa responsabilidad vive en los hooks.
+Ver sección "Simulación de datos asíncronos" arriba. No hace el `.map()` de productos: esa responsabilidad es de `ItemList`.
 
 ### `ItemList`
-Recorre los productos filtrados con `.map()` y renderiza un `ProductCard` por cada uno, con `key={item.id}` en el elemento retornado por el `.map()` (usando el id real, nunca el índice).
+Recorre los productos filtrados con `.map()` y renderiza un `ProductCard` por cada uno, con `key={item.id}` en el elemento retornado por el `.map()` (id real del mock, nunca el índice del array).
 
 ### `ProductCard`
-Componente de presentación de cada producto en la grilla. Recibe el objeto `item` por props y desestructura sus campos (`nombre`, `precio`, `imagen`, `categoria`). Mantiene su propio estado `esFavorito` (booleano, `useState`), invertido con `toggleFavorite`. El contador de cantidad no vive acá: reutiliza el componente `ItemCount`.
+Componente de presentación de cada producto en la grilla. Recibe `item` por props y desestructura `id`, `name`, `price`, `img`, `category`. Envuelve la imagen y el título en un `Link` de React Router hacia `/detalle/:id`, para navegar al detalle sin recargar la página. Mantiene su propio estado `esFavorito` (booleano). Reutiliza `ItemCount` para el contador, sin límite de stock.
 
 ### `ItemCount`
-Componente reutilizable de contador con botones `-`/`+`. Recibe `stock` por prop (opcional): si se pasa, el contador respeta ese tope máximo (`Math.min`); si no se pasa, incrementa sin límite. Nunca permite bajar de cero. Se usa tanto en `ProductCard` (sin límite de stock) como en `ItemDetail` (con el stock real del producto) — evitando reescribir la misma lógica dos veces.
+Componente reutilizable de contador con botones `-`/`+`. Si recibe la prop `stock`, respeta ese tope máximo; si no la recibe, incrementa sin límite. Nunca permite bajar de cero. Se usa tanto en `ProductCard` (sin stock) como en `ItemDetail` (con el stock real del producto).
 
 ### `ItemDetailContainer`
-Contenedor de la vista de detalle de un producto. Recibe `productId` por props, ejecuta `getProductById(productId)` dentro de un `useEffect` (con `async/await`), y guarda el resultado en el estado `producto`. Mientras se resuelve la promesa muestra "Cargando producto...", y si la promesa se rechaza (producto inexistente o error de red) muestra un mensaje de error en rojo. No contiene el diseño del detalle: delega toda la presentación a `ItemDetail`.
+Lee el parámetro `id` de la URL con `useParams()` (de React Router). Ejecuta `getProductById(id)` dentro de un `useEffect` con dependencia `[id]` (para volver a buscar si el usuario navega a otro producto sin recargar), guarda el resultado en estado y delega la presentación a `ItemDetail`. Maneja los estados de carga y error.
 
 ### `ItemDetail`
-Componente de presentación de la vista de detalle. Recibe el `producto` completo por props y desestructura sus campos (`nombre`, `precio`, `categoria`, `imagen`, `descripcion`, `stock`). Muestra información que no aparece en la tarjeta resumida (`ProductCard`): descripción completa y stock disponible. Reutiliza `ItemCount`, pasándole el `stock` real del producto para que el contador respete ese límite.
+Componente de presentación del detalle completo. Recibe el producto por props y muestra información adicional a la que aparece en `ProductCard`: descripción completa y stock disponible. Reutiliza `ItemCount`, pasándole el stock real para que el contador respete ese límite.
 
-## Custom Hooks
-
-### `useFetch(url)`
-Hook genérico y reutilizable que encapsula el patrón repetitivo de hacer un `fetch`, manejar `loading`/`error`, y guardar el resultado crudo en `data`. No sabe nada sobre productos ni sobre la forma específica de los datos — podría usarse para consumir cualquier endpoint.
-
-```jsx
-const { data, loading, error } = useFetch(url)
-```
-
-- **Estados:** `data` (inicia en `null`), `loading` (inicia en `true`), `error` (inicia en `null`).
-- **`useEffect` con dependencia `[url]`:** vuelve a ejecutar el fetch si la URL cambia, no solo al montar.
-- Verifica `response.ok` manualmente y fuerza un error con `throw new Error(...)` si la respuesta HTTP no es exitosa, ya que `fetch` no lanza excepciones automáticamente ante un 404 o 500.
-- Usa `finally` para garantizar que `loading` pase a `false` tanto en el caso de éxito como en el de error.
-
-### `useProducts(url)`
-Hook específico del dominio de productos, construido **sobre** `useFetch` (composición de hooks). Se encarga únicamente de la transformación de datos: mapea los campos de la Fake Store API (`title`, `price`, `image`, `category`) a los nombres que usan los componentes (`nombre`, `precio`, `imagen`, `categoria`). No tiene `useState` ni `useEffect` propios — toda esa lógica la delega a `useFetch`.
-
-```jsx
-const { products, loading, error } = useProducts(import.meta.env.VITE_API_URL)
-```
-
-Esta separación en dos capas evita repetir el patrón de fetch en cada hook nuevo que se necesite: si mañana hiciera falta un hook para traer categorías o usuarios, alcanzaría con reutilizar `useFetch` y sumar solo la lógica de mapeo particular.
-
-## Servicios
-
-### `getProductById(productId)`
-Función que retorna una `Promise`, ubicada en `src/services/`. Recibe un `productId` dinámico (nunca un valor fijo) y hace un `fetch` a `${VITE_API_URL_BASE}/products/${productId}`. Si la respuesta no es exitosa, o si la API devuelve `null` (caso en el que la Fake Store API responde 200 con cuerpo vacío para ids inexistentes), rechaza la promesa con un `Error`. Si el producto existe, lo mapea a los mismos nombres de campo usados en el resto de la app y resuelve la promesa con ese objeto. El campo `stock` no existe en la Fake Store API real, por lo que se simula con un valor fijo.
+### `NotFound`
+Página comodín para cualquier URL que no matchea ninguna ruta definida (`path="*"`), con un enlace de vuelta al inicio.
 
 ## Filtrado en `ItemListContainer`
 
-`itemsFiltrados` se recalcula en cada render a partir de `products`, `categoriaActiva` y `busqueda`, sin necesidad de un `useEffect` adicional ni de repetir el fetch:
-
 ```jsx
-const itemsFiltrados = products
-  .filter((item) => categoriaActiva === null || item.categoria === categoriaActiva)
-  .filter((item) => item.nombre.toLowerCase().includes(busqueda.toLowerCase()))
+const itemsFiltrados = items
+  .filter((item) => categoriaActiva === null || item.category === categoriaActiva)
+  .filter((item) => item.name.toLowerCase().includes(busqueda.toLowerCase()))
 ```
 
-## Verificación manual del manejo de errores
-
-Para comprobar que la UI no se rompe si la API falla, se puede cambiar temporalmente `VITE_API_URL` (o `VITE_API_URL_BASE`) en `.env` a una ruta inexistente, reiniciar el servidor de Vite, y confirmar que aparece el mensaje de error en rojo en vez de que la aplicación quede en blanco.
+Se recalcula en cada render a partir de `items`, `categoriaActiva` y `busqueda`, sin necesidad de un `useEffect` adicional.
 
 ## Próximos pasos
 
-- Implementar rutas de navegación (React Router), incluyendo la vista de detalle conectada dinámicamente por URL (`/producto/:id`) en vez del `productId` fijo actual.
-- Convertir el `CartWidget` en un carrito funcional con estado global (Context API), integrando el valor seleccionado en `ItemCount` al agregar un producto al carrito.
+- Convertir el `CartWidget` en un carrito funcional con estado global (Context API), integrando la cantidad seleccionada en `ItemCount` al agregar un producto.
 - Agregar tests unitarios con Vitest + React Testing Library.
-- Debounce en el input de búsqueda para no filtrar en cada tecla presionada.
+- Debounce en el input de búsqueda.
+- Reemplazar el mock local por una base de datos real (Firebase o un backend propio) cuando el proyecto lo requiera.
