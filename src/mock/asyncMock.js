@@ -113,6 +113,6 @@ export function getProducts() {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(products)
-    }, 1000)
+    }, 2000)
   })
 }
