@@ -1,30 +1,39 @@
 import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import NavBar from './components/NavBar/NavBar'
-import ItemListContainer from './components/ItemListContainer/ItemListContainer.jsx'
-import ItemDetailContainer from './components/ItemDetailContainer/ItemDetailContainer.jsx'
+import Home from './pages/Home'
+import ItemListContainer from './components/ItemListContainer/ItemListContainer'
+import ItemDetailContainer from './components/ItemDetailContainer/ItemDetailContainer'
+import NotFound from './pages/NotFound'
 import './App.css'
 
 function App() {
-  const greeting = "Mates para acompañar cada momento"
-
   const [categoriaActiva, setCategoriaActiva] = useState(null)
   const [busqueda, setBusqueda] = useState('')
 
   return (
-    <>      
+    <>
       <NavBar
         categoriaActiva={categoriaActiva}
         setCategoriaActiva={setCategoriaActiva}
         busqueda={busqueda}
         setBusqueda={setBusqueda}
       />
-      <ItemListContainer
-        greeting={greeting}
-        categoriaActiva={categoriaActiva}
-        busqueda={busqueda}
-      />
 
-      <ItemDetailContainer productId={1} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/productos"
+          element={
+            <ItemListContainer
+              categoriaActiva={categoriaActiva}
+              busqueda={busqueda}
+            />
+          }
+        />
+        <Route path="/detalle/:id" element={<ItemDetailContainer />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
   )
 }

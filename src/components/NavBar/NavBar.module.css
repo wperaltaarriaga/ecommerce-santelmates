@@ -76,3 +76,25 @@
 .searchInput:focus {
   border-color: #999;
 }
+
+.links {
+  display: flex;
+  gap: 20px;
+}
+
+.navLink {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  transition: color 0.15s ease;
+}
+
+.navLink:hover {
+  color: #111;
+}
+
+.navLinkActive {
+  color: #111;
+  font-weight: 700;
+}
