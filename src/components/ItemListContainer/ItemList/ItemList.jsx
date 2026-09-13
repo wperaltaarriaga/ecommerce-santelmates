@@ -1,11 +1,11 @@
 import styles from './ItemList.module.css'
-import ProductCard from '../ProductCard/ProductCard'
+import Item from '../Item/Item'
 
 function ItemList({ items }) {
   return (
     <div className={styles.grid}>
       {items.map((item) => (
-        <ProductCard key={item.id} item={item} />
+        <Item key={item.id} item={item} />
       ))}
     </div>
   )

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import styles from './ItemListContainer.module.css'
 import ItemList from './ItemList/ItemList.jsx'
 import { getProducts } from '../../mock/asyncMock'
 
-function ItemListContainer({ categoriaActiva, busqueda }) {
+function ItemListContainer({ busqueda }) {
+  const { categoryId } = useParams()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -13,18 +15,12 @@ function ItemListContainer({ categoriaActiva, busqueda }) {
       setItems(data)
       setLoading(false)
     }
-
     fetchItems()
-
-    // Array de dependencias vacío ([]): la carga simulada debe ocurrir
-    // una sola vez, al montar el componente. Si se omitiera, el efecto
-    // se dispararía en cada render y, como adentro cambia el estado,
-    // entraría en un bucle infinito.
   }, [])
 
   const itemsFiltrados = items
-    .filter((item) => categoriaActiva === null || item.category === categoriaActiva)
-    .filter((item) => item.name.toLowerCase().includes(busqueda.toLowerCase()))
+    .filter((item) => !categoryId || item.category.toLowerCase() === categoryId.toLowerCase())
+    .filter((item) => item.name.toLowerCase().includes((busqueda || '').toLowerCase()))
 
   return (
     <section className={styles.productsSection}>

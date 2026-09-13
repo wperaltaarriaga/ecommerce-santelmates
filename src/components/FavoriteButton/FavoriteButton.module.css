@@ -1,0 +1,24 @@
+.favButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+  
+  .favButton:hover {
+    transform: scale(1.08);
+  }
+  
+  .favActive {
+    background-color: #ffe5e8;
+  }

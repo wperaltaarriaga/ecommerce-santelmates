@@ -4,7 +4,7 @@ import CartWidget from '../CartWidget/CartWidget'
 
 const categorias = ['Mates', 'Bombillas', 'Despolvilladores']
 
-function NavBar({ categoriaActiva, setCategoriaActiva, busqueda, setBusqueda }) {
+function NavBar({ busqueda, setBusqueda }) {
   return (
     <nav className={styles.nav}>
       <NavLink to="/" className={styles.brand}>
@@ -14,10 +14,12 @@ function NavBar({ categoriaActiva, setCategoriaActiva, busqueda, setBusqueda }) 
       <div className={styles.links}>
         <NavLink
           to="/"
+          end
           className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
         >
           Inicio
         </NavLink>
+
         <NavLink
           to="/productos"
           className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
@@ -28,13 +30,13 @@ function NavBar({ categoriaActiva, setCategoriaActiva, busqueda, setBusqueda }) 
 
       <div className={styles.pillNav}>
         {categorias.map((categoria) => (
-          <button
+          <NavLink
             key={categoria}
-            className={`${styles.pillItem} ${categoria === categoriaActiva ? styles.pillActive : ''}`}
-            onClick={() => setCategoriaActiva(categoria)}
+            to={`/category/${categoria.toLowerCase()}`}
+            className={({ isActive }) => `${styles.pillItem} ${isActive ? styles.pillActive : ''}`}
           >
             {categoria}
-          </button>
+          </NavLink>
         ))}
       </div>
 

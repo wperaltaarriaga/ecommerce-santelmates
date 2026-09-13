@@ -1,4 +1,6 @@
 import ItemCount from '../ItemCount/ItemCount'
+import ProductInfo from '../../ProductInfo/ProductInfo.jsx'
+import FavoriteButton from '../../FavoriteButton/FavoriteButton.jsx'
 import styles from './ItemDetail.module.css'
 
 function ItemDetail({ producto }) {
@@ -8,14 +10,11 @@ function ItemDetail({ producto }) {
     <section className={styles.detail}>
       <div className={styles.imageWrapper}>
         <img src={img} alt={name} className={styles.image} />
+        <FavoriteButton />
       </div>
 
-      <div className={styles.info}>
-        <span className={styles.category}>{category}</span>
-        <h1 className={styles.title}>{name}</h1>
-        <p className={styles.price}>${price.toLocaleString('es-AR')}</p>
-        <p className={styles.description}>{description}</p>
-
+      <div>
+        <ProductInfo category={category} name={name} price={price} description={description} variant="detail" />
         <ItemCount stock={stock} />
       </div>
     </section>
