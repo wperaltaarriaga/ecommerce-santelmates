@@ -1,7 +1,20 @@
 .article {
   display: flex;
   flex-direction: column;
-  cursor: default;
+  height: 100%;
+  position: relative;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.link * {
+  text-decoration: none;
 }
 
 .imageWrapper {
@@ -24,8 +37,7 @@
 .detailButton {
   display: block;
   text-align: center;
-  text-decoration: none;
-  margin-top: 12px;
+  margin-top: auto;
   padding: 10px 16px;
   border: 1px solid #ddd;
   border-radius: 999px;
@@ -35,7 +47,7 @@
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.detailButton:hover {
+.link:hover .detailButton {
   border-color: #999;
   background-color: #f9f9f9;
 }

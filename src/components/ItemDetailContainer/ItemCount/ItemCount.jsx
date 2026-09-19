@@ -12,11 +12,23 @@ function ItemCount({ stock, initial = 1, onAdd }) {
     setCantidad((prev) => (prev > 0 ? prev - 1 : 0))
   }
 
+  const handleAgregar = () => {
+    if (onAdd) onAdd(cantidad)
+  }
+
   return (
-    <div className={styles.itemCount}>
-      <button className={styles.button} onClick={restar}>-</button>
-      <span className={styles.cantidad}>{cantidad}</span>
-      <button className={styles.button} onClick={sumar}>+</button>
+    <div className={styles.wrapper}>
+      <div className={styles.itemCount}>
+        <button className={styles.button} onClick={restar}>-</button>
+        <span className={styles.cantidad}>{cantidad}</span>
+        <button className={styles.button} onClick={sumar}>+</button>
+      </div>
+
+      {onAdd && (
+        <button className={styles.addButton} onClick={handleAgregar}>
+          Agregar al carrito
+        </button>
+      )}
     </div>
   )
 }

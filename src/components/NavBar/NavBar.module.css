@@ -1,20 +1,27 @@
 .nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
+  gap: 24px;
   padding: 16px 32px;
   background-color: #fff;
   border-bottom: 1px solid #ececec;
 }
 
+.nav a {
+  text-decoration: none;
+}
+
 .brand {
   display: flex;
   align-items: center;
+  justify-self: start;
 }
 
 .brandName {
-  font-size: 20px;
-  font-weight: 600;
+  font-family: 'Parisienne', cursive;
+  font-size: 30px;
+  font-weight: 400;
   margin: 0;
   color: #111;
 }
@@ -26,6 +33,7 @@
   border-radius: 999px;
   padding: 4px;
   gap: 2px;
+  justify-self: center;
 }
 
 .pillItem {
@@ -51,16 +59,11 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
-@media (max-width: 768px) {
-  .pillNav {
-    display: none;
-  }
-}
-
 .rightSide {
   display: flex;
   align-items: center;
   gap: 16px;
+  justify-self: end;
 }
 
 .searchInput {
@@ -77,24 +80,29 @@
   border-color: #999;
 }
 
-.links {
-  display: flex;
-  gap: 20px;
-}
-
-.navLink {
-  text-decoration: none;
+.allItem {
+  padding: 8px 20px;
   font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  transition: color 0.15s ease;
+  font-weight: 600;
+  color: #111;
+  border-radius: 999px;
+  transition: all 0.2s ease;
 }
 
-.navLink:hover {
-  color: #111;
+.allActive {
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
-.navLinkActive {
-  color: #111;
-  font-weight: 700;
+.divider {
+  width: 1px;
+  height: 18px;
+  background-color: #ccc;
+  margin: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .pillNav {
+    display: none;
+  }
 }

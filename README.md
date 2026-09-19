@@ -1,14 +1,15 @@
 # Santelmates 🧉
 
-E-commerce de mates artesanales, desarrollado con **React + Vite** como práctica de composición de componentes, manejo de estado (`useState`), efectos (`useEffect`), simulación de datos asíncronos con `Promise`, y navegación con **React Router** (rutas dinámicas, layout persistente y checkout con navegación programática).
+E-commerce de productos artesanales de mate (yerberas, bombillas, mates, etc.) construido con React + Vite como proyecto integrador del curso.
 
 ## Stack
 
-- React
-- Vite
-- React Router DOM
-- Bootstrap (estilos base)
-- CSS Modules
+- **React** (componentes funcionales + hooks)
+- **Vite** (bundler y dev server)
+- **React Router DOM** (v7) para el enrutamiento
+- **Context API** para el estado global (carrito y favoritos)
+- **CSS Modules** para los estilos
+- Datos simulados con una **Promise + setTimeout** (sin backend real todavía)
 
 ## Cómo correr el proyecto
 
@@ -17,202 +18,139 @@ npm install
 npm run dev
 ```
 
-La app queda disponible en `http://localhost:5173`. No requiere ninguna API externa ni servidor adicional: los datos de productos se simulan localmente con un mock asíncrono (ver sección "Simulación de datos").
+La app queda disponible en `http://localhost:5173`.
 
 ## Estructura del proyecto
 
 ```
 src/
-  mock/
-    asyncMock.js
-  services/
-    getProductById.js
-  components/
-    NavBar/
-      NavBar.jsx
-      NavBar.module.css
-    Footer/
-      Footer.jsx
-      Footer.module.css
-    CartWidget/
-      CartWidget.jsx
-      CartWidget.module.css
-    ItemListContainer/
-      ItemListContainer.jsx
-      ItemListContainer.module.css
-      ItemList/
-        ItemList.jsx
-        ItemList.module.css
-      Item/
-        Item.jsx
-        Item.module.css
-    ItemDetailContainer/
-      ItemDetailContainer.jsx
-      ItemDetailContainer.module.css
-      ItemDetail/
-        ItemDetail.jsx
-        ItemDetail.module.css
-      ItemCount/
-        ItemCount.jsx
-        ItemCount.module.css
-    ProductInfo/
-      ProductInfo.jsx
-      ProductInfo.module.css
-    FavoriteButton/
-      FavoriteButton.jsx
-      FavoriteButton.module.css
-  pages/
-    Home.jsx
-    Home.module.css
-    Checkout/
-      Checkout.jsx
-      Checkout.module.css
-    NotFound/
-      NotFound.jsx
-      NotFound.module.css
-  App.jsx
-  App.module.css
-  main.jsx
-  index.css
-public/
-  hero/
-    hero-mate.jpg
-  imagenes/
+├── App.jsx                        # Layout raíz: Providers + BrowserRouter + Routes
+├── main.jsx                       # Punto de entrada (renderiza <App />)
+├── mock/
+│   └── asyncMock.js                # Array de productos + getProducts() (Promise, 2000ms)
+├── services/
+│   └── getProductById.js           # Busca un producto por id (Promise)
+├── hooks/
+│   ├── useFetch.js                 # Hook genérico de fetch a una URL (preparado para API real)
+│   ├── useProducts.js              # Trae el listado de productos (hoy desde el mock)
+│   └── useProductDetail.js         # Trae un producto por id (hoy desde el mock)
+├── context/
+│   ├── CartContext.jsx             # Estado global del carrito (dividido en Data/Actions)
+│   └── FavoritesContext.jsx        # Estado global de favoritos
+├── components/
+│   ├── NavBar/                     # Navbar con categorías, buscador y widgets
+│   ├── Footer/
+│   ├── CartWidget/                 # Ícono del carrito con contador (abre el CartDrawer)
+│   ├── CartDrawer/                 # Panel lateral con el resumen del carrito
+│   ├── Favorite/
+│   │   ├── FavoriteButton/          # Botón de favorito compartido (card y detalle)
+│   │   └── FavoritesWidget/         # Ícono de favoritos con contador
+│   ├── Toast/                      # Notificación de "producto agregado"
+│   ├── Skeletons/                  # Placeholders de carga (card y detalle)
+│   ├── EmptyState/                 # Mensaje + CTA para listas vacías
+│   ├── ProductInfo/                # Info de producto compartida (card y detalle)
+│   ├── ProductCarousel/            # Carrusel horizontal de productos destacados
+│   ├── ItemListContainer/
+│   │   ├── ItemListContainer.jsx   # Usa useProducts(), filtra, ordena y controla loading
+│   │   ├── ItemList/                # Renderiza la grilla de Items
+│   │   └── Item/                    # Card de producto (catálogo)
+│   └── ItemDetailContainer/
+│       ├── ItemDetailContainer.jsx # Usa useProductDetail(id); renderiza ItemDetail + ProductCarousel
+│       ├── Breadcrumbs/             # Migas de pan (Catálogo / Categoría / Producto)
+│       ├── ItemDetail/              # Vista completa del producto
+│       └── ItemCount/               # Selector de cantidad (reutilizable)
+└── pages/
+    ├── Home.jsx                    # Hero + catálogo + carrusel
+    ├── Cart/                       # Vista del carrito (/cart)
+    ├── Favoritos/                  # Vista de favoritos (/favoritos)
+    ├── Checkout/                   # Simulación de compra (/checkout)
+    └── NotFound/                   # Página 404
 ```
 
 ## Enrutamiento
 
-`BrowserRouter` se declara dentro de `App.jsx` (no en `main.jsx`), envolviendo tanto el layout persistente (`NavBar` + `Footer`) como el `<Routes>`. Esto hace que `App` funcione como el layout de toda la aplicación: `NavBar` y `Footer` se escriben una única vez, fuera de `<Routes>`, y se mantienen fijos en pantalla sin importar qué ruta esté activa.
-
-```jsx
-<BrowserRouter>
-  <div className={styles.page}>
-    <NavBar busqueda={busqueda} setBusqueda={setBusqueda} />
-    <main className={styles.main}>
-      <Routes>...</Routes>
-    </main>
-    <Footer />
-  </div>
-</BrowserRouter>
-```
-
-### Tabla de rutas
+El `BrowserRouter` vive en `App.jsx`, envolviendo tanto el `NavBar` como las `Routes`, para que la navegación esté disponible en toda la app.
 
 | Ruta | Componente | Descripción |
 |---|---|---|
-| `/` | `Home` | Página de bienvenida con hero de imagen de fondo. |
-| `/productos` | `ItemListContainer` | Catálogo completo, sin filtro de categoría. |
-| `/category/:categoryId` | `ItemListContainer` | Catálogo filtrado dinámicamente por categoría según el parámetro de la URL. |
-| `/item/:id` | `ItemDetailContainer` | Vista de detalle de un producto puntual, identificado por su id en la URL. |
-| `/checkout` | `Checkout` | Simulación de pago con formulario y redirección automática. |
-| `*` | `NotFound` | Página 404 para cualquier URL que no matchea ninguna ruta anterior. |
+| `/` | `Home` | Hero + catálogo completo + carrusel de destacados |
+| `/productos` | `ItemListContainer` | Catálogo completo, con orden y búsqueda |
+| `/category/:categoryId` | `ItemListContainer` | Catálogo filtrado por categoría |
+| `/item/:id` | `ItemDetailContainer` | Detalle de un producto |
+| `/cart` | `Cart` | Carrito de compras |
+| `/favoritos` | `Favoritos` | Productos marcados como favoritos |
+| `/checkout` | `Checkout` | Simulación de finalización de compra |
+| `*` | `NotFound` | Página 404 |
 
-### Navegación por categoría (`/category/:categoryId`)
+La navegación interna se hace siempre con `<Link>` / `<NavLink>` (nunca `<a>`), para no perder el estado de los Contexts al navegar.
 
-Las categorías del `NavBar` son `NavLink` que apuntan directo a una URL, en vez de botones que solo cambiaban un estado local:
+## Custom hooks
 
-```jsx
-<NavLink to={`/category/${categoria.toLowerCase()}`}>{categoria}</NavLink>
-```
+- **`useProducts`**: trae el listado completo de productos (hoy desde `getProducts()` del mock). Devuelve `{ products, loading, error }`.
+- **`useProductDetail(id)`**: trae un producto puntual por id (hoy desde `getProductById()`). Devuelve `{ producto, loading, error }`.
+- **`useFetch`**: hook genérico de fetch a una URL, dejado preparado para cuando se conecte una API real (por ahora sin usar).
 
-`ItemListContainer` lee ese parámetro con `useParams()` y filtra el catálogo ya cargado:
+Encapsular esta lógica en hooks separa el "cómo se consiguen los datos" del "cómo se muestran": los containers (`ItemListContainer`, `ItemDetailContainer`) solo llaman al hook correspondiente y quedan enfocados en el renderizado. El día que se reemplace el mock por una API real, el cambio queda contenido adentro del hook, sin tocar los componentes que lo consumen.
 
-```jsx
-const { categoryId } = useParams()
+## Estado global con Context API
 
-const itemsFiltrados = items
-  .filter((item) => !categoryId || item.category.toLowerCase() === categoryId.toLowerCase())
-  .filter((item) => item.name.toLowerCase().includes((busqueda || '').toLowerCase()))
-```
+### CartContext
 
-Como la categoría vive en la URL (no en estado de React compartido a mano entre componentes), el filtro funciona desde cualquier página de la app —incluida la vista de detalle— sin necesitar lógica adicional de sincronización.
+Está dividido en dos contexts para optimizar renders:
 
-### Detalle de producto (`/item/:id`)
+- **`CartDataContext`**: expone los datos (`cart`, `totalItems`, `totalPrice`, `isCartOpen`, `toast`).
+- **`CartActionsContext`**: expone las acciones (`addItem`, `removeItem`, `updateQuantity`, `clear`, `isInCart`, `openCart`, `closeCart`), todas envueltas en `useCallback` para que su referencia no cambie entre renders.
 
-`Item` (la card del catálogo) enlaza a cada producto con `Link`:
+Hooks disponibles:
+- `useCartData()` / `useCartActions()`: para consumir solo lo que se necesita.
+- `useCart()`: combina ambos, pensado para componentes que necesitan de todo un poco (como `Cart.jsx`).
 
-```jsx
-<Link to={`/item/${id}`}>Ver detalle</Link>
-```
+Todas las actualizaciones son inmutables (`.map()`, `.filter()`, spread), nunca se muta el array `cart` directamente.
 
-`ItemDetailContainer` lee el id con `useParams()` y, cuando cambia (el usuario navega de un producto a otro sin recargar), vuelve a buscar el producto correspondiente:
+Al agregar un producto (`addItem`) **no se abre automáticamente el CartDrawer**: solo se muestra un `Toast` de confirmación. El drawer se abre exclusivamente al hacer clic en el `CartWidget` de la navbar.
 
-```jsx
-const { id } = useParams()
+### FavoritesContext
 
-useEffect(() => {
-  // ...getProductById(id)...
-}, [id])
-```
+Mismo patrón, más simple (un solo context): `favorites`, `toggleFavorite`, `isFavorite`, `totalFavorites`.
 
-### Ruta 404
+Ambos Providers envuelven el `BrowserRouter` en `App.jsx`, así que el estado persiste al navegar entre rutas (se pierde solo si se recarga la página por completo, porque es estado en memoria).
 
-`path="*"` actúa como comodín: React Router evalúa las rutas en orden, así que esta, al ser la última, captura cualquier URL que no coincidió con ninguna de las anteriores. `NotFound` muestra un "404" grande de fondo con el mensaje y enlaces (`Link`) de vuelta a `Inicio` y `Catálogo`.
+## Componentes de experiencia (UI)
 
-## Simulación de datos asíncronos
+- **`CartDrawer`**: panel lateral que se abre desde el `CartWidget`, muestra los items, subtotal y botones para ir al carrito o a checkout.
+- **`Toast`**: notificación temporal ("Producto agregado al carrito") que se autodestruye a los 2.5s.
+- **`Skeletons`** (`SkeletonCard`, `SkeletonDetail`): placeholders animados (shimmer) que se muestran mientras `getProducts()` / `getProductById()` resuelven su Promise.
+- **`EmptyState`**: componente genérico reutilizado en catálogo sin resultados, favoritos vacíos y carrito vacío.
+- **`Breadcrumbs`**: migas de pan en la vista de detalle.
+- **`CartWidget` / `FavoritesWidget`**: íconos con contador en la navbar.
 
-En lugar de consumir una API externa, el catálogo vive en un **mock local** (`src/mock/asyncMock.js`) que simula el comportamiento de una petición de red real:
+## Catálogo y detalle de producto
 
-- Un array `products` con 12 productos, cada uno con `id`, `name`, `price`, `category`, `img`, `stock` y `description`.
-- La función `getProducts()`, que retorna una `Promise`. Un `setTimeout` de 2000ms simula la demora de red antes de resolver con el array completo.
+- **`ItemListContainer`**: usa el hook `useProducts()` para traer los productos, controla el estado de `loading`, filtra por categoría (`useParams`) y por búsqueda (prop `busqueda`), y permite ordenar por precio o nombre.
+- **`Item`**: card de catálogo, es un `<Link>` completo hacia `/item/:id`, con el botón de favorito posicionado por fuera del link para que no dispare la navegación.
+- **`ItemDetailContainer`**: usa el hook `useProductDetail(id)` para traer un producto puntual, maneja `loading` y `error`, y renderiza `ItemDetail` junto con un `ProductCarousel` de productos relacionados.
+- **`ItemDetail`**: vista completa del producto (breadcrumb, imagen, botón de favorito, info y `ItemCount`).
+- **`ItemCount`**: selector de cantidad reutilizado en el detalle, respeta el stock y no permite valores negativos; al agregar, llama a `addItem` del `CartContext`.
+- **`ProductInfo`**: componente compartido entre `Item`, `ItemDetail` y `ProductCarousel` (con prop `variant` para adaptar el heading, y el precio es opcional para poder ocultarlo en el carrusel).
 
-`ItemListContainer` consume esto con `useState` + `useEffect` (array de dependencias vacío, para que la carga ocurra una única vez al montar) y `async/await`. Mientras `loading` es `true` se muestra "Cargando productos...".
+## Página del carrito (`Cart.jsx`)
 
-`src/services/getProductById.js` reutiliza `getProducts()` para buscar un producto puntual por `id` con `.find()` (nunca por índice/posición), y rechaza la promesa si no existe ningún producto con ese id.
+- Si el carrito está vacío, muestra un `EmptyState` con CTA al catálogo.
+- Si tiene productos, lista cada item con imagen, precio unitario, controles de cantidad (+/-), subtotal y botón de eliminar.
+- Muestra el total general y botones para vaciar el carrito o ir a `/checkout`.
 
-## Componentes
+## Checkout
 
-### `NavBar`
-Presente en todas las páginas (vive en `App`, fuera de `<Routes>`). Contiene el branding, enlaces de navegación (`NavLink` a `/` y `/productos`, con estilo condicional según la ruta activa), las categorías como `NavLink` dinámicos hacia `/category/:categoryId`, un input de búsqueda y el `CartWidget`.
+Simulación de finalización de compra: al enviar el formulario se muestra un estado de "procesando" (2s) y luego un mensaje de éxito con redirección automática a `/` (3s), además de botones para volver antes o cancelar.
 
-### `Footer`
-Presente en todas las páginas, junto al `NavBar`. Contiene el copyright de la marca.
+## Notas importantes
 
-### `CartWidget`
-Ícono de carrito con badge de cantidad (prop `cantidad`, hardcodeada por ahora; pendiente de conectar a un estado global del carrito).
-
-### `ItemListContainer`
-Obtiene los productos del mock, lee `categoryId` de la URL con `useParams`, y filtra por categoría y por texto de búsqueda antes de pasarle el resultado a `ItemList`. No hace el `.map()` de productos ni conoce la forma de la card: esa responsabilidad es de `ItemList`/`Item`.
-
-### `ItemList`
-Recorre los productos filtrados con `.map()` y renderiza un `Item` por cada uno, con `key={item.id}` en el elemento retornado por el `.map()` (id real del mock, nunca el índice).
-
-### `Item`
-Card de producto en el catálogo. Recibe `item` por props y arma: imagen + `FavoriteButton`, el bloque de información (`ProductInfo`) y un botón "Ver detalle" que enlaza a `/item/:id`. No incluye `ItemCount` (ese control solo tiene sentido en la vista de detalle, donde se conoce el stock real).
-
-### `ItemDetailContainer`
-Lee `id` de la URL con `useParams()`, ejecuta `getProductById(id)` dentro de un `useEffect` con dependencia `[id]`, guarda el resultado en estado y delega toda la presentación a `ItemDetail`. Maneja los estados de carga y error.
-
-### `ItemDetail`
-Vista de detalle completa. Arma: imagen + `FavoriteButton`, el bloque de información (`ProductInfo`, en su variante `detail`, con tipografía más grande) y `ItemCount` con el stock real del producto.
-
-### `ProductInfo` (compartido)
-Componente de presentación puro, extraído para eliminar la duplicación que existía entre `Item` e `ItemDetail`: ambos mostraban exactamente el mismo bloque (categoría, nombre, precio, descripción), solo con distinto tamaño de tipografía. Recibe `category`, `name`, `price`, `description` y una prop `variant` (`'card'` por defecto o `'detail'`) que decide si el título se renderiza como `h3` o `h1`, y aplica los tamaños de fuente correspondientes vía una clase modificadora en CSS.
-
-```jsx
-<ProductInfo category={category} name={name} price={price} description={description} />
-<ProductInfo ... variant="detail" />
-```
-
-### `FavoriteButton` (compartido)
-Botón de favorito (🤍 / ❤️) extraído a su propio componente, reutilizado tanto en `Item` como en `ItemDetail`. Mantiene su propio estado `esFavorito` (`useState`), independiente por cada instancia.
-
-### `ItemCount`
-Contador reutilizable con botones `-`/`+`. Si recibe la prop `stock`, respeta ese tope máximo (`Math.min`); nunca permite bajar de cero. Se usa únicamente dentro de `ItemDetail`.
-
-### `Checkout`
-Simula un flujo de pago real usando `onSubmit` + `event.preventDefault()` (evita la recarga completa de la página que rompería el estado de React). Usa `useNavigate()`:
-
-- Redirección automática a `/` unos segundos después de completar el pago simulado.
-- Botón "Volver ya mismo" con navegación inmediata (`navigate('/')`).
-- Botón "Cancelar" con `navigate(-1)`, equivalente a apretar "atrás" en el navegador.
-
-### `NotFound`
-Página comodín para `path="*"`. Muestra un "404" grande de fondo (marca de agua) con el mensaje de error superpuesto y dos enlaces de vuelta (`Inicio` / `Ver catálogo`).
+- El estado del carrito y de favoritos vive en memoria (Context API), no hay persistencia real todavía. Si se recarga la página por completo (o se escribe una URL directamente en la barra de direcciones), el estado se reinicia — es el comportamiento esperado, no un bug.
+- Los datos de productos son simulados con `getProducts()` / `getProductById()`, que devuelven Promises con delay artificial (2000ms y 500ms respectivamente) para practicar el manejo de estados de carga.
 
 ## Próximos pasos
 
-- Conectar `CartWidget` y `ItemCount` a un `CartContext` (Context API) para un carrito funcional real, evitando prop drilling.
-- Persistir el carrito en `localStorage`.
-- Agregar tests unitarios con Vitest + React Testing Library.
-- Debounce en el input de búsqueda.
+- Persistencia real con Firebase (guardar orden de compra, descontar stock).
+- Migrar `useProducts` / `useProductDetail` para consumir una API real (usando `useFetch`).
+- Formulario de checkout con validación de datos del comprador.
+- Deploy a producción (Vercel).

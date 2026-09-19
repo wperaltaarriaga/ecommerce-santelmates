@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import styles from './NavBar.module.css'
 import CartWidget from '../CartWidget/CartWidget'
+import FavoritesWidget from '../Favorite/FavoritesWidget/FavoritesWidget'
 
 const categorias = ['Mates', 'Bombillas', 'Despolvilladores']
 
@@ -11,24 +12,15 @@ function NavBar({ busqueda, setBusqueda }) {
         <h1 className={styles.brandName}>Santel Mates</h1>
       </NavLink>
 
-      <div className={styles.links}>
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-        >
-          Inicio
-        </NavLink>
-
+      <div className={styles.pillNav}>
         <NavLink
           to="/productos"
-          className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
+          end
+          className={({ isActive }) => `${styles.pillItem} ${isActive ? styles.pillActive : ''}`}
         >
-          Catálogo
+          Todos
         </NavLink>
-      </div>
-
-      <div className={styles.pillNav}>
+        <span className={styles.divider} />
         {categorias.map((categoria) => (
           <NavLink
             key={categoria}
@@ -48,7 +40,8 @@ function NavBar({ busqueda, setBusqueda }) {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
-        <CartWidget cantidad={3} />
+        <FavoritesWidget />
+        <CartWidget />
       </div>
     </nav>
   )

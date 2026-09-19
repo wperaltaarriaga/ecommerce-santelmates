@@ -1,41 +1,23 @@
-import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { getProductById } from '../../services/getProductById'
 import ItemDetail from './ItemDetail/ItemDetail.jsx'
+import { SkeletonDetail } from '../Skeletons/Skeletons.jsx'
+import useProductDetail from '../../hooks/useProductDetail'
 import styles from './ItemDetailContainer.module.css'
+import ProductCarousel from '../ProductCarousel/ProductCarousel.jsx'
 
 function ItemDetailContainer() {
   const { id } = useParams()
+  const { producto, loading, error } = useProductDetail(id)
 
-  const [producto, setProducto] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    const fetchProducto = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const data = await getProductById(id)
-        setProducto(data)
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProducto()
-
-    // Array de dependencias [id]: si el usuario navega de un producto a
-    // otro (cambia el parámetro de la URL), el efecto debe volver a
-    // pedir el nuevo producto correspondiente.
-  }, [id])
-
-  if (loading) return <p className={styles.loadingText}>Cargando producto...</p>
+  if (loading) return <SkeletonDetail />
   if (error) return <p className={styles.errorText}>⚠️ {error}</p>
 
-  return <ItemDetail producto={producto} />
+  return (
+    <div>
+      <ItemDetail producto={producto} />
+      <ProductCarousel currentProductId={id} category={producto.category} />
+    </div>
+  )
 }
 
 export default ItemDetailContainer
