@@ -1,142 +1,232 @@
-.container {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 60px 24px;
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 32px;
+  text-align: center;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 40px;
+  align-items: start;
+}
+
+.formColumn {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
   }
-  
-  .title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111;
-    margin: 0 0 32px;
-    text-align: center;
+
+  .cartSummary {
+    position: static;
+    order: -1;
   }
-  
-  .field {
-    margin-bottom: 20px;
+}
+
+.cartSummary {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 20px;
+  position: sticky;
+  top: 24px;
+}
+
+.cartSummaryTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 16px;
+}
+
+.cartList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.cartRow {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.cartThumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: var(--color-bg-soft-2);
+}
+
+.cartInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cartItemName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.cartItemQty {
+  font-size: 12px;
+  color: var(--color-muted-lighter);
+  margin: 0;
+}
+
+.cartItemSubtotal {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.cartTotal {
+  text-align: right;
+  font-size: 15px;
+  color: var(--color-ink);
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-dark);
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-muted-light);
+}
+
+.input:disabled {
+  background-color: var(--color-bg-soft-2);
+  cursor: not-allowed;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-muted-light);
+}
+
+.textarea:disabled {
+  background-color: var(--color-bg-soft-2);
+  cursor: not-allowed;
+}
+
+.fieldError {
+  color: var(--color-danger);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+.submitButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-ink);
+  color: var(--color-white);
+  border: none;
+  padding: 14px 24px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.submitButton:disabled {
+  background-color: var(--color-muted-light);
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-white);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 8px;
-  }
-  
-  .input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 15px;
-    box-sizing: border-box;
-    transition: border-color 0.15s ease;
-  }
-  
-  .input:focus {
-    outline: none;
-    border-color: #999;
-  }
-  
-  .input:disabled {
-    background-color: #f4f4f4;
-    cursor: not-allowed;
-  }
-  
-  .submitButton {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background-color: #111;
-    color: #fff;
-    border: none;
-    padding: 14px 24px;
-    border-radius: 999px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-  }
-  
-  .submitButton:disabled {
-    background-color: #999;
-    cursor: not-allowed;
-  }
-  
-  .spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid #fff;
-    border-top-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    animation: spin 0.6s linear infinite;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  .cancelButton {
-    display: block;
-    width: 100%;
-    margin-top: 16px;
-    background: transparent;
-    color: #666;
-    border: 1px solid #ddd;
-    padding: 12px 24px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: border-color 0.15s ease, color 0.15s ease;
-  }
-  
-  .cancelButton:hover {
-    border-color: #999;
-    color: #111;
-  }
-  
-  .successContainer {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 80px 24px;
-    text-align: center;
-  }
-  
-  .successTitle {
-    font-size: 24px;
-    font-weight: 700;
-    color: #111;
-    margin: 0 0 12px;
-  }
-  
-  .successText {
-    font-size: 15px;
-    color: #888;
-    margin: 0 0 32px;
-    line-height: 1.6;
-  }
-  
-  .successButton {
-    display: inline-block;
-    background-color: #111;
-    color: #fff;
-    border: none;
-    padding: 14px 32px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.15s ease;
-  }
-  
-  .successButton:hover {
-    background-color: #333;
-    transform: translateY(-1px);
-  }
+}
+
+.cancelButton {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  background: transparent;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border-light);
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.cancelButton:hover {
+  border-color: var(--color-muted-light);
+  color: var(--color-ink);
+}
+
+.successContainer {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  text-align: center;
+}

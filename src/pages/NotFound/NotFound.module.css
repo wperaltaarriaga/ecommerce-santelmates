@@ -6,7 +6,7 @@
   min-height: 75vh;
   overflow: hidden;
   padding: 40px 24px;
-  background-color: #fff;
+  background-color: var(--color-white);
 }
 
 .bigNumber {
@@ -14,7 +14,7 @@
   font-size: 400px;
   font-weight: 800;
   letter-spacing: -20px;
-  color: #f0f0f0;
+  color: var(--color-bg-soft);
   z-index: 0;
   user-select: none;
   line-height: 1;
@@ -39,14 +39,14 @@
   font-size: 34px;
   font-weight: 800;
   letter-spacing: -1px;
-  color: #111;
+  color: var(--color-ink);
   margin: 0 0 12px;
   line-height: 1.15;
 }
 
 .subtext {
   font-size: 20px;
-  color: #888;
+  color: var(--color-muted-lighter);
   line-height: 1.6;
   margin: 0 0 32px;
 }
@@ -59,8 +59,8 @@
 }
 
 .primaryButton {
-  background-color: #111;
-  color: #fff;
+  background-color: var(--color-ink);
+  color: var(--color-white);
   text-decoration: none;
   padding: 14px 28px;
   border-radius: 999px;
@@ -70,15 +70,15 @@
 }
 
 .primaryButton:hover {
-  background-color: #333;
+  background-color: var(--color-dark);
   transform: translateY(-1px);
 }
 
 .secondaryButton {
-  color: #111;
+  color: var(--color-ink);
   text-decoration: none;
   padding: 14px 28px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-light);
   border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
@@ -86,7 +86,7 @@
 }
 
 .secondaryButton:hover {
-  border-color: #999;
+  border-color: var(--color-muted-light);
   transform: translateY(-1px);
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getProductById } from '../services/getProductById'
+import { getProductById } from '../services/firebaseProducts.js'
 
 function useProductDetail(id) {
   const [producto, setProducto] = useState(null)

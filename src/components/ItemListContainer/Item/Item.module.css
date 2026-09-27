@@ -23,7 +23,7 @@
   aspect-ratio: 1 / 1;
   border-radius: 16px;
   overflow: hidden;
-  background-color: #f4f4f4;
+  background-color: var(--color-bg-soft-2);
   margin-bottom: 12px;
 }
 
@@ -39,15 +39,15 @@
   text-align: center;
   margin-top: auto;
   padding: 10px 16px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-light);
   border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
-  color: #111;
+  color: var(--color-ink);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .link:hover .detailButton {
-  border-color: #999;
-  background-color: #f9f9f9;
+  border-color: var(--color-muted-light);
+  background-color: var(--color-bg-soft-3);
 }

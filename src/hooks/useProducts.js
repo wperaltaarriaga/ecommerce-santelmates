@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { getProducts } from '../mock/asyncMock'
+import { getProducts } from '../services/firebaseProducts.js'
 
-function useProducts() {
+function useProducts(categoryId) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -10,7 +10,8 @@ function useProducts() {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        const data = await getProducts()
+        setError(null)
+        const data = await getProducts(categoryId)
         setProducts(data)
       } catch (err) {
         setError(err.message)
@@ -19,7 +20,7 @@ function useProducts() {
       }
     }
     fetchProducts()
-  }, [])
+  }, [categoryId])
 
   return { products, loading, error }
 }

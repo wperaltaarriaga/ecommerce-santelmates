@@ -4,6 +4,9 @@ import '@fontsource/parisienne/400.css'
 import './index.css'
 import App from './App.jsx'
 import "bootstrap/dist/css/bootstrap.min.css"
+  // import { seedProducts } from './firebase/seedProduts.js'
+
+  // seedProducts()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

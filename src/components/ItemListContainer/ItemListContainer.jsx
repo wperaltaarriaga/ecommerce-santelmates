@@ -8,12 +8,12 @@ import useProducts from '../../hooks/useProducts'
 
 function ItemListContainer({ busqueda }) {
   const { categoryId } = useParams()
-  const { products: items, loading } = useProducts()
+  const { products: items, loading, error } = useProducts(categoryId)
   const [orden, setOrden] = useState('default')
 
-  let itemsFiltrados = items
-    .filter((item) => !categoryId || item.category.toLowerCase() === categoryId.toLowerCase())
-    .filter((item) => item.name.toLowerCase().includes((busqueda || '').toLowerCase()))
+  let itemsFiltrados = items.filter((item) =>
+    item.name.toLowerCase().includes((busqueda || '').toLowerCase())
+  )
 
   if (orden === 'price-asc') itemsFiltrados = [...itemsFiltrados].sort((a, b) => a.price - b.price)
   else if (orden === 'price-desc') itemsFiltrados = [...itemsFiltrados].sort((a, b) => b.price - a.price)
@@ -35,6 +35,16 @@ function ItemListContainer({ busqueda }) {
         <div className={styles.grid}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
+      ) : error ? (
+        <EmptyState emoji="⚠️" title="No pudimos cargar el catálogo" text={error} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          emoji="✨"
+          title="Ya casi está listo"
+          text="Estamos sumando productos a esta categoría. Volvé pronto o mirá el resto del catálogo mientras tanto."
+          ctaText="Ver catálogo completo"
+          ctaTo="/productos"
+        />
       ) : itemsFiltrados.length === 0 ? (
         <EmptyState emoji="🔍" title="No encontramos ese mate" text="Probá con otra categoría o buscá algo distinto." />
       ) : (

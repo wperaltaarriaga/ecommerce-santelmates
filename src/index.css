@@ -1,0 +1,24 @@
+:root {
+    --color-ink: #111;
+    --color-white: #fff;
+    --color-border: #ececec;
+    --color-border-light: #ddd;
+    --color-divider: #ccc;
+    --color-muted: #666;
+    --color-muted-light: #999;
+    --color-muted-lighter: #888;
+    --color-dark: #333;
+    --color-bg-soft: #f0f0f0;
+    --color-bg-soft-2: #f4f4f4;
+    --color-bg-soft-3: #f9f9f9;
+    --color-danger: #e63946;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    color: var(--color-ink);
+  }

@@ -1,32 +1,32 @@
 .detail {
-    padding: 0;
-  }
-  
-  .detail .category {
-    font-size: 13px;
-    letter-spacing: 1.5px;
-    margin-bottom: 4px;
-  }
-  
-  .detail .title {
-    font-size: 40px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    margin: 8px 0 16px;
-    line-height: 1.1;
-  }
-  
-  .detail .price {
-    font-size: 24px;
-    font-weight: 600;
-    color: #111;
-    margin: 0 0 24px;
-  }
-  
-  .detail .description {
-    font-size: 16px;
-    color: #666;
-    line-height: 1.7;
-    margin: 0;
-    max-width: 420px;
-  }
+  padding: 0;
+}
+
+.detail .category {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+
+.detail .title {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 8px 0 16px;
+  line-height: 1.1;
+}
+
+.detail .price {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0 0 24px;
+}
+
+.detail .description {
+  font-size: 16px;
+  color: var(--color-muted);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 420px;
+}

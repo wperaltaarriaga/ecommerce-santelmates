@@ -15,17 +15,17 @@
 .button {
   width: 36px;
   height: 36px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-light);
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-white);
   cursor: pointer;
   font-size: 16px;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .button:hover {
-  border-color: #999;
-  background-color: #f9f9f9;
+  border-color: var(--color-muted-light);
+  background-color: var(--color-bg-soft-3);
 }
 
 .cantidad {
@@ -36,8 +36,8 @@
 }
 
 .addButton {
-  background-color: #111;
-  color: #fff;
+  background-color: var(--color-ink);
+  color: var(--color-white);
   border: none;
   padding: 16px 32px;
   border-radius: 999px;
@@ -48,6 +48,6 @@
 }
 
 .addButton:hover {
-  background-color: #333;
+  background-color: var(--color-dark);
   transform: translateY(-1px);
 }

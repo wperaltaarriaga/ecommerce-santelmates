@@ -14,7 +14,7 @@
 }
 
 .cartWidget:hover {
-  background-color: #f4f4f4;
+  background-color: var(--color-bg-soft-2);
 }
 
 .icon {
@@ -26,8 +26,8 @@
   position: absolute;
   top: -2px;
   right: -2px;
-  background-color: #111;
-  color: #fff;
+  background-color: var(--color-ink);
+  color: var(--color-white);
   font-size: 10px;
   font-weight: 600;
   min-width: 16px;
