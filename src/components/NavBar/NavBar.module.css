@@ -143,8 +143,149 @@
   background-color: var(--color-border);
 }
 
-@media (max-width: 768px) {
-  .pillNav {
+/* ---------- Menú hamburguesa (celular y tablet) ---------- */
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  height: 2px;
+  background-color: var(--color-ink);
+  border-radius: 2px;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  z-index: 90;
+}
+
+.mobilePanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background-color: var(--color-white);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px 20px 24px;
+  overflow-y: auto;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  animation: entrar 0.2s ease-out;
+}
+
+@keyframes entrar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.closeButton {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.mobileSearch {
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  padding: 12px 16px;
+  font-size: 16px; /* 16px evita que iOS haga zoom al tocar el input */
+  outline: none;
+  width: 100%;
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileLink,
+.mobileSubLink {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.mobileSubLink {
+  padding: 10px 14px 10px 30px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.mobileLinkActive {
+  background-color: var(--color-border);
+  color: var(--color-ink);
+}
+
+.mobileAuth {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 1024px) {
+  .nav {
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+
+  .pillNav,
+  .soloEscritorio {
     display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .brand {
+    justify-self: start;
+  }
+
+  .brandName {
+    font-size: 26px;
+  }
+
+  .rightSide {
+    gap: 12px;
   }
 }
