@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './CartWidget.module.css'
-import { useCartData, useCartActions } from '../../context/CartContext'
+import { useCartData, useCartActions } from '../../hooks/useCart'
 
 function CartWidget() {
   const { totalItems } = useCartData()

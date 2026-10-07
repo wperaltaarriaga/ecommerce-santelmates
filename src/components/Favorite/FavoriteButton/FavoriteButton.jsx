@@ -1,4 +1,4 @@
-import { useFavorites } from '../../../context/FavoritesContext'
+import { useFavorites } from '../../../hooks/useFavorites'
 import styles from './FavoriteButton.module.css'
 
 function FavoriteButton({ item }) {

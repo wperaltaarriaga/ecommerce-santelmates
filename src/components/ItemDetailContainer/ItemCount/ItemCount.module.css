@@ -51,3 +51,20 @@
   background-color: var(--color-dark);
   transform: translateY(-1px);
 }
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stock {
+  font-size: 14px;
+  color: var(--color-muted-light);
+  margin: 0;
+}
+
+.sinStock {
+  margin-top: 32px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-danger);
+}

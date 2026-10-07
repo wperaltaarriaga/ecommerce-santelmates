@@ -13,8 +13,8 @@ function useProducts(categoryId) {
         setError(null)
         const data = await getProducts(categoryId)
         setProducts(data)
-      } catch (err) {
-        setError(err.message)
+      } catch {
+        setError('Revisá tu conexión e intentá de nuevo en unos segundos.')
       } finally {
         setLoading(false)
       }

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useFavorites } from '../../../context/FavoritesContext.jsx'
+import { useFavorites } from '../../../hooks/useFavorites'
 import styles from './FavoritesWidget.module.css'
 
 function FavoritesWidget() {

@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useCallback } from 'react'
-
-const FavoritesContext = createContext(undefined)
+import { useState, useCallback } from 'react'
+import { FavoritesContext } from './contexts'
 
 export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState([])
@@ -22,12 +21,4 @@ export function FavoritesProvider({ children }) {
       {children}
     </FavoritesContext.Provider>
   )
-}
-
-export function useFavorites() {
-  const context = useContext(FavoritesContext)
-  if (context === undefined) {
-    throw new Error('useFavorites debe usarse dentro de un <FavoritesProvider>')
-  }
-  return context
 }

@@ -1,4 +1,4 @@
-import { useCartData } from '../../context/CartContext'
+import { useCartData } from '../../hooks/useCart'
 import styles from './Toast.module.css'
 
 function Toast() {

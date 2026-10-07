@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
-import { db } from '../../firebase/config'
-import { useAuth } from '../../context/AuthContext'
-import { useCart } from '../../context/CartContext'
+import { Link, useNavigate } from 'react-router-dom'
+import { serverTimestamp } from 'firebase/firestore'
+import { crearOrden, SinStockError } from '../../services/firebaseOrders'
+import { useAuth } from '../../hooks/useAuth'
+import { useCart } from '../../hooks/useCart'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import styles from './Checkout.module.css'
 
@@ -30,7 +30,7 @@ export default function Checkout() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState(null)
   const [orderId, setOrderId] = useState(null)
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const { cart, totalPrice, clear } = useCart()
   const navigate = useNavigate()
 
@@ -84,11 +84,11 @@ export default function Checkout() {
         createdAt: serverTimestamp()
       }
 
-      const docRef = await addDoc(collection(db, 'orders'), order)
-      setOrderId(docRef.id)
+      const nuevoId = await crearOrden(order)
+      setOrderId(nuevoId)
       clear()
     } catch (err) {
-      setError('No pudimos generar tu orden. Intentá de nuevo.')
+      setError(err instanceof SinStockError ? err.message : 'No pudimos generar tu orden. Intentá de nuevo.')
     } finally {
       setIsProcessing(false)
     }
@@ -100,10 +100,20 @@ export default function Checkout() {
         <h2 className={styles.successTitle}>¡Compra confirmada!</h2>
         <p className={styles.successText}>
           Tu número de orden es <strong>{orderId}</strong>. Guardalo como comprobante.
+          También lo vas a encontrar en <Link to="/mis-compras">Mis compras</Link>.
         </p>
         <button className={styles.successButton} onClick={() => navigate('/')}>
           Volver al inicio
         </button>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className={styles.loadingSession}>
+        <span className={styles.spinner} />
+        Verificando tu sesión...
       </div>
     )
   }
@@ -120,6 +130,25 @@ export default function Checkout() {
     )
   }
 
+  // Sin sesión: se pide iniciar sesión. El carrito vive en el Context, así que no se pierde.
+  if (!user) {
+    return (
+      <div className={styles.successContainer}>
+        <h2 className={styles.successTitle}>Iniciá sesión para continuar</h2>
+        <p className={styles.successText}>
+          Tenés {cart.length} {cart.length === 1 ? 'producto' : 'productos'} en el carrito.
+          Ingresá con tu cuenta para completar los datos de entrega y confirmar la compra.
+        </p>
+        <Link to="/login" state={{ from: '/checkout' }} className={styles.authLink}>
+          Iniciar sesión
+        </Link>
+        <p className={styles.authSecondary}>
+          ¿No tenés cuenta? <Link to="/register">Registrate</Link>
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Finalizar Compra</h1>
@@ -127,8 +156,10 @@ export default function Checkout() {
       <div className={styles.layout}>
         <form onSubmit={handlePurchase} noValidate className={styles.formColumn}>
           <div className={styles.field}>
-            <label className={styles.label}>Nombre y apellido</label>
+            <label htmlFor="checkout-nombreApellido" className={styles.label}>Nombre y apellido</label>
             <input
+              id="checkout-nombreApellido"
+              autoComplete="name"
               type="text"
               disabled={isProcessing}
               value={datosComprador.nombreApellido}
@@ -139,8 +170,10 @@ export default function Checkout() {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Teléfono</label>
+            <label htmlFor="checkout-telefono" className={styles.label}>Teléfono</label>
             <input
+              id="checkout-telefono"
+              autoComplete="tel"
               type="tel"
               disabled={isProcessing}
               value={datosComprador.telefono}
@@ -151,8 +184,10 @@ export default function Checkout() {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Dirección</label>
+            <label htmlFor="checkout-direccion" className={styles.label}>Dirección</label>
             <input
+              id="checkout-direccion"
+              autoComplete="street-address"
               type="text"
               disabled={isProcessing}
               value={datosComprador.direccion}
@@ -163,8 +198,10 @@ export default function Checkout() {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Ciudad</label>
+            <label htmlFor="checkout-ciudad" className={styles.label}>Ciudad</label>
             <input
+              id="checkout-ciudad"
+              autoComplete="address-level2"
               type="text"
               disabled={isProcessing}
               value={datosComprador.ciudad}
@@ -175,8 +212,9 @@ export default function Checkout() {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Información adicional (opcional)</label>
+            <label htmlFor="checkout-infoAdicional" className={styles.label}>Información adicional (opcional)</label>
             <textarea
+              id="checkout-infoAdicional"
               disabled={isProcessing}
               value={datosComprador.infoAdicional}
               onChange={handleChange('infoAdicional')}
@@ -186,7 +224,7 @@ export default function Checkout() {
             />
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button type="submit" disabled={isProcessing} className={styles.submitButton}>
             {isProcessing && <span className={styles.spinner} />}

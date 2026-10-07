@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import ItemDetail from './ItemDetail/ItemDetail.jsx'
 import { SkeletonDetail } from '../Skeletons/Skeletons.jsx'
 import useProductDetail from '../../hooks/useProductDetail'
-import styles from './ItemDetailContainer.module.css'
+import EmptyState from '../EmptyState/EmptyState.jsx'
 import ProductCarousel from '../ProductCarousel/ProductCarousel.jsx'
 
 function ItemDetailContainer() {
@@ -10,7 +10,18 @@ function ItemDetailContainer() {
   const { producto, loading, error } = useProductDetail(id)
 
   if (loading) return <SkeletonDetail />
-  if (error) return <p className={styles.errorText}>⚠️ {error}</p>
+  if (error) {
+    const noExiste = error === 'Producto no encontrado'
+    return (
+      <EmptyState
+        emoji={noExiste ? '🔎' : '⚠️'}
+        title={noExiste ? 'Este producto no existe' : 'No pudimos cargar el producto'}
+        text={noExiste ? 'Puede que el enlace esté mal escrito o que el producto ya no esté disponible.' : error}
+        ctaText="Ver catálogo"
+        ctaTo="/productos"
+      />
+    )
+  }
 
   return (
     <div>

@@ -14,7 +14,9 @@ function useProductDetail(id) {
         const data = await getProductById(id)
         setProducto(data)
       } catch (err) {
-        setError(err.message)
+        setError(err.message === 'Producto no encontrado'
+          ? err.message
+          : 'No pudimos cargar el producto. Revisá tu conexión e intentá de nuevo.')
       } finally {
         setLoading(false)
       }

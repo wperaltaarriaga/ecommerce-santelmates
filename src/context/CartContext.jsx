@@ -1,12 +1,36 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { CartDataContext, CartActionsContext } from './contexts'
 
-const CartDataContext = createContext(undefined)
-const CartActionsContext = createContext(undefined)
+const STORAGE_KEY = 'santelmates-cart'
+
+// Si el producto trae stock, la cantidad nunca lo supera
+function limitarAlStock(item, quantity) {
+  return item.stock !== undefined ? Math.min(quantity, item.stock) : quantity
+}
+
+// Lee el carrito guardado. Si no hay nada o el navegador bloquea el storage, arranca vacío.
+function leerCarritoGuardado() {
+  try {
+    const guardado = localStorage.getItem(STORAGE_KEY)
+    return guardado ? JSON.parse(guardado) : []
+  } catch {
+    return []
+  }
+}
 
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = useState(leerCarritoGuardado)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [toast, setToast] = useState(null)
+
+  // Cada vez que cambia el carrito, se guarda para que sobreviva a una recarga
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart))
+    } catch {
+      // modo incógnito o storage lleno: el carrito sigue funcionando en memoria
+    }
+  }, [cart])
 
   useEffect(() => {
     if (!toast) return
@@ -19,10 +43,10 @@ export function CartProvider({ children }) {
       const existe = prev.find((p) => p.id === item.id)
       if (existe) {
         return prev.map((p) =>
-          p.id === item.id ? { ...p, quantity: p.quantity + quantity } : p
+          p.id === item.id ? { ...p, quantity: limitarAlStock(p, p.quantity + quantity) } : p
         )
       }
-      return [...prev, { ...item, quantity }]
+      return [...prev, { ...item, quantity: limitarAlStock(item, quantity) }]
     })
     setToast(`${item.name} agregado al carrito`)
   }, [])
@@ -38,7 +62,7 @@ export function CartProvider({ children }) {
   const updateQuantity = useCallback((itemId, quantity) => {
     setCart((prev) => {
       if (quantity <= 0) return prev.filter((p) => p.id !== itemId)
-      return prev.map((p) => (p.id === itemId ? { ...p, quantity } : p))
+      return prev.map((p) => (p.id === itemId ? { ...p, quantity: limitarAlStock(p, quantity) } : p))
     })
   }, [])
 
@@ -59,20 +83,4 @@ export function CartProvider({ children }) {
       </CartDataContext.Provider>
     </CartActionsContext.Provider>
   )
-}
-
-export function useCartData() {
-  const context = useContext(CartDataContext)
-  if (context === undefined) throw new Error('useCartData debe usarse dentro de un <CartProvider>')
-  return context
-}
-
-export function useCartActions() {
-  const context = useContext(CartActionsContext)
-  if (context === undefined) throw new Error('useCartActions debe usarse dentro de un <CartProvider>')
-  return context
-}
-
-export function useCart() {
-  return { ...useCartData(), ...useCartActions() }
 }

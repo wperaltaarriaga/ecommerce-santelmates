@@ -1,0 +1,206 @@
+.page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  background: none;
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.tabActiva {
+  background-color: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-white);
+}
+
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 14px 20px;
+  min-width: 160px;
+}
+
+.datoValor {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.datoLabel {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+/* La tabla scrollea horizontalmente en mobile en vez de romper el layout */
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 640px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: top;
+  color: var(--color-ink);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.nombre {
+  font-weight: 600;
+}
+
+.categoria,
+.itemOrden {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+.itemOrden {
+  color: var(--color-ink);
+  font-size: 13px;
+}
+
+.totalCelda {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.input {
+  width: 110px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.sinStock {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.acciones {
+  white-space: nowrap;
+}
+
+.saveButton {
+  background-color: var(--color-ink);
+  color: var(--color-white);
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ok {
+  margin-left: 8px;
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.errorMini {
+  margin-left: 8px;
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.vacio {
+  color: var(--color-muted);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 24px;
+  color: var(--color-muted);
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-muted-light);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

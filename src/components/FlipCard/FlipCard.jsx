@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   animate,
   motion,
@@ -57,7 +57,10 @@ export default function FlipCard({
   const [dragging, setDragging] = useState(false);
   const shown = controlled ? flipped : inner;
   const shownRef = useRef(shown);
-  shownRef.current = shown;
+  // Se sincroniza después del render (no durante) para no tocar refs mientras React renderiza
+  useLayoutEffect(() => {
+    shownRef.current = shown;
+  }, [shown]);
   const rootRef = useRef(null);
   const grip = useRef(null);
   const spin = useRef(null);
@@ -123,7 +126,9 @@ export default function FlipCard({
     if (e.target.closest('a, button, [data-no-flip]')) return; // 👈 no flipear si el click arranca en un link/botón
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {}
+    } catch {
+      // algunos navegadores no soportan pointer capture: se sigue sin él
+    }
     spin.current?.stop();
     grip.current = {
       id: e.pointerId,
@@ -172,7 +177,9 @@ export default function FlipCard({
     grip.current = null;
     try {
       if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch {
+      // el puntero ya se había liberado
+    }
     setDragging(false);
     if (e.pointerType === 'touch' || !rootRef.current?.matches(':hover')) rest();
     if (!g.moved) {

@@ -76,3 +76,25 @@
     color: var(--color-ink);
     font-weight: 600;
   }
+.forgotLink {
+  align-self: flex-end;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-muted);
+  margin: -12px 0 24px;
+  line-height: 1.5;
+}
+
+.success {
+  color: var(--color-ink);
+  background-color: var(--color-bg-soft-3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}

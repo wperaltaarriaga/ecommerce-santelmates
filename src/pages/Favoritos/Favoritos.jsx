@@ -1,4 +1,4 @@
-import { useFavorites } from '../../context/FavoritesContext'
+import { useFavorites } from '../../hooks/useFavorites'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import FlipCard from '../../components/FlipCard/FlipCard.jsx'
 import { Link } from 'react-router-dom'

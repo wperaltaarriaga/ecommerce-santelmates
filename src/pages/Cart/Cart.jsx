@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../../context/CartContext'
+import { useCart } from '../../hooks/useCart'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import styles from './Cart.module.css'
 
@@ -45,6 +45,7 @@ function Cart() {
               <button
                 className={styles.qtyButton}
                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                disabled={item.quantity >= item.stock}
               >
                 +
               </button>
