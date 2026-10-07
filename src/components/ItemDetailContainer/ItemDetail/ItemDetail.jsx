@@ -23,7 +23,7 @@ function ItemDetail({ producto }) {
 
       <section className={styles.detail}>
         <div className={styles.imageWrapper}>
-          <img src={img} alt={name} className={styles.image} />
+          <img src={img} alt={name} className={styles.image} fetchPriority="high" />
           <FavoriteButton item={producto} />
         </div>
 

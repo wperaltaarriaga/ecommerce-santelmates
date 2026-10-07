@@ -25,7 +25,7 @@ function Cart() {
       <div className={styles.list}>
         {cart.map((item) => (
           <div className={styles.row} key={item.id}>
-            <img src={item.img} alt={item.name} className={styles.thumb} />
+            <img loading="lazy" decoding="async" src={item.img} alt={item.name} className={styles.thumb} />
 
             <div className={styles.info}>
               <p className={styles.name}>{item.name}</p>

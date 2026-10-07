@@ -34,7 +34,7 @@ function ProductCarousel({ title = 'También te puede interesar', currentProduct
             key={`${item.id}-${index}`}
           >
             <div className={styles.imageWrapper}>
-              <img src={item.img} alt={item.name} className={styles.image} />
+              <img loading="lazy" decoding="async" src={item.img} alt={item.name} className={styles.image} />
             </div>
             <ProductInfo
               category={item.category}

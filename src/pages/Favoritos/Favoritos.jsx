@@ -30,6 +30,8 @@ function Favoritos() {
               color="#f5f0ea"
               front={
                 <img
+                  loading="lazy"
+                  decoding="async"
                   src={item.img}
                   alt={item.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}

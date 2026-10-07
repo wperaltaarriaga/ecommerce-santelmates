@@ -48,6 +48,8 @@ function CartDrawer() {
               {cart.map((item) => (
                 <div className={styles.item} key={item.id}>
                   <img
+                    loading="lazy"
+                    decoding="async"
                     src={item.img}
                     alt={item.name}
                     className={styles.thumb}

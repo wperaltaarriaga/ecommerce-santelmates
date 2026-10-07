@@ -241,7 +241,7 @@ export default function Checkout() {
           <div className={styles.cartList}>
             {cart.map((item) => (
               <div className={styles.cartRow} key={item.id}>
-                <img src={item.img} alt={item.name} className={styles.cartThumb} />
+                <img loading="lazy" decoding="async" src={item.img} alt={item.name} className={styles.cartThumb} />
                 <div className={styles.cartInfo}>
                   <p className={styles.cartItemName}>{item.name}</p>
                   <p className={styles.cartItemQty}>Cantidad: {item.quantity}</p>

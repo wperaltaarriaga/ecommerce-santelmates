@@ -10,7 +10,7 @@ function Item({ item }) {
     <article className={styles.article}>
       <Link to={`/item/${id}`} className={styles.link}>
         <div className={styles.imageWrapper}>
-          <img src={img} alt={name} className={styles.image} />
+          <img loading="lazy" decoding="async" src={img} alt={name} className={styles.image} />
         </div>
 
         <ProductInfo category={category} name={name} price={price} description={description} />

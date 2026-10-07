@@ -29,3 +29,6 @@ dist-ssr
 
 # Clave privada de Firebase Admin
 serviceAccountKey.json
+
+# Fotos originales en alta (no se suben, ya están optimizadas en public/)
+fotos-originales/
