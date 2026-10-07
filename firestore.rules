@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers de autenticación y roles ----------
+
+    function estaLogueado() {
+      return request.auth != null;
+    }
+
+    // Rol "admin" asignado como custom claim desde el Admin SDK:
+    //   admin.auth().setCustomUserClaims(uid, { admin: true })
+    function esAdmin() {
+      return estaLogueado() && request.auth.token.admin == true;
+    }
+
+    function esTextoValido(valor, min, max) {
+      return valor is string && valor.size() >= min && valor.size() <= max;
+    }
+
+    // ---------- Validaciones de productos ----------
+
+    function esProductoValido(p) {
+      return p.keys().hasAll(['name', 'price', 'category', 'categoryPath', 'img', 'stock', 'description'])
+        && p.keys().hasOnly(['name', 'price', 'category', 'categoryPath', 'img', 'stock', 'description', 'lastOrderId'])
+        && esTextoValido(p.name, 1, 100)
+        && p.price is number && p.price > 0
+        && esTextoValido(p.category, 1, 50)
+        && p.categoryPath is list
+        && esTextoValido(p.img, 1, 300)
+        && p.stock is int && p.stock >= 0
+        && esTextoValido(p.description, 0, 1000);
+    }
+
+    // Un comprador puede bajar el stock solo como parte de una compra:
+    // tiene que indicar en lastOrderId una orden NUEVA (creada en esta misma
+    // transacción) que sea suya. No puede tocar ningún otro campo ni subir el stock.
+    function esDescuentoDeStockPorCompra() {
+      let antes = resource.data;
+      let despues = request.resource.data;
+      let ordenPath = /databases/$(database)/documents/orders/$(despues.lastOrderId);
+      return estaLogueado()
+        && despues.diff(antes).affectedKeys().hasOnly(['stock', 'lastOrderId'])
+        && despues.stock is int && despues.stock >= 0 && despues.stock < antes.stock
+        && despues.lastOrderId is string
+        && !exists(ordenPath)
+        && existsAfter(ordenPath)
+        && getAfter(ordenPath).data.userId == request.auth.uid;
+    }
+
+    // ---------- Validaciones de órdenes ----------
+
+    function esCompradorValido(b) {
+      return b is map
+        && b.keys().hasAll(['nombreApellido', 'telefono', 'direccion', 'ciudad', 'infoAdicional'])
+        && b.keys().hasOnly(['nombreApellido', 'telefono', 'direccion', 'ciudad', 'infoAdicional'])
+        && esTextoValido(b.nombreApellido, 1, 100)
+        && esTextoValido(b.telefono, 1, 30)
+        && esTextoValido(b.direccion, 1, 200)
+        && esTextoValido(b.ciudad, 1, 100)
+        && esTextoValido(b.infoAdicional, 0, 500);
+    }
+
+    // Las reglas no permiten recorrer listas, así que se valida el
+    // primer ítem como muestra y el tamaño total de la lista.
+    function esItemValido(i) {
+      return i is map
+        && i.keys().hasOnly(['id', 'name', 'price', 'quantity'])
+        && esTextoValido(i.id, 1, 100)
+        && esTextoValido(i.name, 1, 100)
+        && i.price is number && i.price > 0
+        && i.quantity is int && i.quantity > 0;
+    }
+
+    function esOrdenValida(o) {
+      return o.keys().hasAll(['userId', 'userEmail', 'buyer', 'items', 'total', 'createdAt'])
+        && o.keys().hasOnly(['userId', 'userEmail', 'buyer', 'items', 'total', 'createdAt'])
+        && o.userId == request.auth.uid
+        && o.userEmail == request.auth.token.email
+        && esCompradorValido(o.buyer)
+        && o.items is list && o.items.size() > 0 && o.items.size() <= 50
+        && esItemValido(o.items[0])
+        && o.total is number && o.total > 0
+        && o.createdAt == request.time;
+    }
+
+    // ---------- Colecciones ----------
+
+    match /products/{productId} {
+      // Catálogo público
+      allow read: if true;
+      // Solo un admin puede cargar o editar productos, y con la forma correcta
+      allow create: if esAdmin() && esProductoValido(request.resource.data);
+      // Además del admin, un comprador puede descontar stock al generar su orden
+      allow update: if (esAdmin() && esProductoValido(request.resource.data))
+        || esDescuentoDeStockPorCompra();
+      allow delete: if esAdmin();
+    }
+
+    match /orders/{orderId} {
+      // Cada usuario crea órdenes a su propio nombre y con datos válidos
+      allow create: if estaLogueado() && esOrdenValida(request.resource.data);
+      // Cada usuario lee solo sus órdenes; el admin puede leer todas
+      allow read: if estaLogueado()
+        && (resource.data.userId == request.auth.uid || esAdmin());
+      // Una orden no se edita ni se borra desde el cliente
+      allow update, delete: if false;
+    }
+
+    // Cualquier otra colección queda cerrada por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
