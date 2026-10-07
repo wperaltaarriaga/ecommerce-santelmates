@@ -26,3 +26,6 @@ dist-ssr
 .env
 .DS_Store
 *.zip
+
+# Clave privada de Firebase Admin
+serviceAccountKey.json
