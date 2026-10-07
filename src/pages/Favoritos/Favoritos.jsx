@@ -3,8 +3,10 @@ import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import FlipCard from '../../components/FlipCard/FlipCard.jsx'
 import { Link } from 'react-router-dom'
 import styles from './Favoritos.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function Favoritos() {
+  useTituloPagina('Favoritos')
   const { favorites } = useFavorites()
 
   return (

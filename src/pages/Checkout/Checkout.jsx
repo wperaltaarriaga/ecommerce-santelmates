@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import styles from './Checkout.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 const CAMPOS_INICIALES = {
   nombreApellido: '',
@@ -25,6 +26,7 @@ function validarDatosComprador(datos) {
 }
 
 export default function Checkout() {
+  useTituloPagina('Finalizar compra')
   const [datosComprador, setDatosComprador] = useState(CAMPOS_INICIALES)
   const [erroresCampos, setErroresCampos] = useState({})
   const [isProcessing, setIsProcessing] = useState(false)

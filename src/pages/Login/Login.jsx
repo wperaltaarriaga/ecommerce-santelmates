@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import styles from './Login.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function traducirError(code) {
   switch (code) {
@@ -16,6 +17,7 @@ function traducirError(code) {
 }
 
 function Login() {
+  useTituloPagina('Iniciar sesión')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)

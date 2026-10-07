@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import styles from './NotFound.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function NotFound() {
+  useTituloPagina('Página no encontrada')
   return (
     <section className={styles.container}>
       <span className={styles.bigNumber}>404</span>

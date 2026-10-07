@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import styles from '../Login/Login.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function traducirError(code) {
   switch (code) {
@@ -14,6 +15,7 @@ function traducirError(code) {
 }
 
 function Register() {
+  useTituloPagina('Crear cuenta')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)

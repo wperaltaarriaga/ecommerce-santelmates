@@ -5,11 +5,22 @@ import ItemList from './ItemList/ItemList.jsx'
 import { SkeletonCard } from '../Skeletons/Skeletons.jsx'
 import EmptyState from '../EmptyState/EmptyState.jsx'
 import useProducts from '../../hooks/useProducts'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
+import { categorias } from '../../data/categorias'
+import { slugify } from '../../utils/slugify'
 
-function ItemListContainer({ busqueda }) {
+// actualizarTitulo: false cuando se usa dentro de otra página (Home), que maneja su propio título
+function ItemListContainer({ busqueda, actualizarTitulo = true }) {
   const { categoryId } = useParams()
   const { products: items, loading, error } = useProducts(categoryId)
   const [orden, setOrden] = useState('default')
+
+  // Busca el nombre "lindo" de la categoría a partir del slug de la URL
+  const nombreCategoria = categorias
+    .flatMap((c) => [c.nombre, ...c.subcategorias])
+    .find((nombre) => slugify(nombre) === categoryId)
+  const titulo = categoryId ? nombreCategoria || 'Categoría' : 'Productos'
+  useTituloPagina(actualizarTitulo ? titulo : undefined)
 
   let itemsFiltrados = items.filter((item) =>
     item.name.toLowerCase().includes((busqueda || '').toLowerCase())

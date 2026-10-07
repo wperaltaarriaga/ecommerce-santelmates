@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { getOrdenesDeUsuario } from '../../services/firebaseOrders'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import styles from './MisCompras.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function formatearFecha(fecha) {
   if (!fecha) return 'Fecha no disponible'
@@ -11,6 +12,7 @@ function formatearFecha(fecha) {
 }
 
 function MisCompras() {
+  useTituloPagina('Mis compras')
   const { user, loading: loadingSesion } = useAuth()
   const [ordenes, setOrdenes] = useState([])
   const [loading, setLoading] = useState(true)

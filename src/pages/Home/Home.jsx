@@ -1,8 +1,10 @@
 import styles from './Home.module.css'
 import ItemListContainer from '../../components/ItemListContainer/ItemListContainer.jsx'
 import ProductCarousel from '../../components/ProductCarousel/ProductCarousel.jsx'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function Home({ busqueda }) {
+  useTituloPagina(null)
   return (
     <>
       <section className={styles.home}>
@@ -17,7 +19,7 @@ function Home({ busqueda }) {
 
       <section className={styles.catalogSection}>
         <h2 className={styles.catalogTitle}>Mirá nuestro catálogo completo</h2>
-        <ItemListContainer busqueda={busqueda} />
+        <ItemListContainer busqueda={busqueda} actualizarTitulo={false} />
       </section>
 
       <ProductCarousel title="Los elegidos de este mes" />

@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../../hooks/useCart'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import styles from './Cart.module.css'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 
 function Cart() {
+  useTituloPagina('Tu carrito')
   const { cart, removeItem, clear, updateQuantity, totalPrice } = useCart()
 
   if (cart.length === 0) {

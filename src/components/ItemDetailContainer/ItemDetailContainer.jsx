@@ -2,12 +2,14 @@ import { useParams } from 'react-router-dom'
 import ItemDetail from './ItemDetail/ItemDetail.jsx'
 import { SkeletonDetail } from '../Skeletons/Skeletons.jsx'
 import useProductDetail from '../../hooks/useProductDetail'
+import { useTituloPagina } from '../../hooks/useTituloPagina'
 import EmptyState from '../EmptyState/EmptyState.jsx'
 import ProductCarousel from '../ProductCarousel/ProductCarousel.jsx'
 
 function ItemDetailContainer() {
   const { id } = useParams()
   const { producto, loading, error } = useProductDetail(id)
+  useTituloPagina(producto?.name ?? (error ? 'Producto no encontrado' : 'Cargando...'))
 
   if (loading) return <SkeletonDetail />
   if (error) {
