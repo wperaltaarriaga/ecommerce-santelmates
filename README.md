@@ -71,14 +71,15 @@ src/
 │   ├── useProductDetail.js          # Trae un producto por id desde Firestore
 │   ├── useAuth.js                   # Lee el AuthContext
 │   ├── useCart.js                   # useCart, useCartData y useCartActions
-│   └── useFavorites.js              # Lee el FavoritesContext
+│   ├── useFavorites.js              # Lee el FavoritesContext
+│   └── useTituloPagina.js           # Cambia el título de la pestaña según la página
 ├── context/
 │   ├── contexts.js                  # Los objetos createContext (sin componentes)
 │   ├── AuthContext.jsx              # AuthProvider: user, isAdmin, register, login, resetPassword, logout
 │   ├── CartContext.jsx              # CartProvider: carrito (Data/Actions), guardado en localStorage
-│   └── FavoritesContext.jsx         # FavoritesProvider
+│   └── FavoritesContext.jsx         # FavoritesProvider: favoritos, guardados en localStorage
 ├── components/
-│   ├── NavBar/                      # Navbar con categorías, buscador, AuthWidget y widgets
+│   ├── NavBar/                      # Navbar con categorías, buscador, AuthWidget y widgets (menú hamburguesa en mobile)
 │   ├── AuthWidget/                  # Email + botón de cerrar sesión (o link a login) en la navbar
 │   ├── Footer/
 │   ├── CartWidget/                  # Ícono del carrito con contador (abre el CartDrawer)
@@ -109,7 +110,7 @@ src/
     ├── RecuperarPassword/           # Envío de email para resetear la contraseña (/recuperar)
     ├── Checkout/                    # Checkout con renderizado condicional y orden real en Firestore (/checkout)
     ├── MisCompras/                  # Historial de órdenes del usuario (/mis-compras)
-    ├── Admin/                       # Panel de admin: órdenes y edición de precio/stock (/admin)
+    ├── Admin/                       # Panel de admin: órdenes y ABM de productos (/admin)
     └── NotFound/                    # Página 404
 ```
 
@@ -189,7 +190,7 @@ Todas las actualizaciones son inmutables (`.map()`, `.filter()`, spread). Al agr
 
 ### FavoritesContext
 
-Mismo patrón, más simple: `favorites`, `toggleFavorite`, `isFavorite`, `totalFavorites`.
+Mismo patrón, más simple: `favorites`, `toggleFavorite`, `isFavorite`, `totalFavorites`. También se guarda en `localStorage` (clave `santelmates-favoritos`), así sobrevive a una recarga.
 
 ### AuthContext
 
@@ -271,13 +272,21 @@ npx vitest run    # una sola corrida
 
 - `src/context/CartContext.test.jsx`: lógica del carrito (agregar sin duplicar, sumar cantidades, totales, límite de stock, `updateQuantity` a 0, `removeItem`, `clear`, toast, persistencia en `localStorage` y error fuera del Provider).
 - `src/pages/Checkout/Checkout.test.jsx`: flujo de compra con Firebase mockeado (loader de sesión, carrito vacío, sin sesión, validación de campos, creación de la orden con los datos correctos, y que el carrito **no** se vacíe si Firestore falla o falta stock).
+- `src/context/FavoritesContext.test.jsx`: agregar/quitar favoritos y persistencia en `localStorage`.
+- `src/pages/Admin/ProductoForm.test.jsx`: validación del formulario de productos y conversión de números.
 - `src/services/firebaseOrders.test.js`: la transacción de `crearOrden` (descuenta el stock de cada producto, y si a uno no le alcanza no escribe nada).
 
 ## Notas importantes
 
-- El carrito persiste al recargar (`localStorage`); los favoritos viven solo en memoria. La sesión de autenticación persiste al recargar (la maneja Firebase con `onAuthStateChanged`).
+- El carrito y los favoritos persisten al recargar (`localStorage`). La sesión de autenticación persiste al recargar (la maneja Firebase con `onAuthStateChanged`).
 - El catálogo y las órdenes son datos reales en Cloud Firestore, no simulados.
 - `.env` nunca se sube al repositorio (está en `.gitignore`); `.env.example` documenta los nombres de las variables necesarias sin sus valores.
+
+## Mobile, SEO y vista previa al compartir
+
+- **Navbar en mobile y tablet (≤ 1024px)**: el menú de categorías se reemplaza por un botón ☰ que abre un panel lateral con buscador, todas las categorías y subcategorías, favoritos y la cuenta. Se cierra al tocar un link, el fondo o con Escape.
+- **`index.html`** en español (`lang="es"`), con `description` y etiquetas **Open Graph** (`og:title`, `og:image`, etc.) para que el link muestre imagen y descripción al compartirlo por WhatsApp o redes. La imagen es `public/og-image.jpg` (1200×630). Como `og:image` necesita URL absoluta, `vite.config.js` reemplaza `__SITE_URL__` con el dominio de producción de Vercel (`VERCEL_PROJECT_PRODUCTION_URL`) o con `VITE_SITE_URL` si está definida.
+- **Título por página** con el hook `useTituloPagina` (ej. "Mate Grande | Santelmates", "Yerberas | Santelmates").
 
 ## Deploy en Vercel
 
@@ -289,7 +298,7 @@ npx vitest run    # una sola corrida
 ## Mis compras y panel de admin
 
 - **`/mis-compras`**: lista las órdenes del usuario logueado (`where('userId', '==', uid)`), de la más nueva a la más vieja, con fecha, productos, total y dirección de entrega.
-- **`/admin`**: solo para usuarios con el custom claim `admin` (se asigna con `node scripts/hacerAdmin.mjs email`, ver más abajo). Tiene dos pestañas: **Órdenes** (todas, con datos del cliente y total vendido) y **Productos** (editar precio y stock de cada producto). Las reglas de Firestore son las que realmente protegen estos datos: aunque alguien entre a `/admin`, sin el claim Firestore rechaza las lecturas y escrituras.
+- **`/admin`**: solo para usuarios con el custom claim `admin` (se asigna con `node scripts/hacerAdmin.mjs email`, ver más abajo). Tiene dos pestañas: **Órdenes** (todas, con datos del cliente y total vendido) y **Productos**: precio y stock se editan directo en la tabla, y con **+ Nuevo producto** / **Editar** se abre un formulario con todos los campos (nombre, categoría, precio, stock, imagen con vista previa y descripción). También se pueden **eliminar** productos. El formulario valida con los mismos límites que las reglas de Firestore, y `categoryPath` se recalcula solo al cambiar la categoría. Las reglas de Firestore son las que realmente protegen estos datos: aunque alguien entre a `/admin`, sin el claim Firestore rechaza las lecturas y escrituras.
 
 ### Cómo crear un admin
 
@@ -300,5 +309,6 @@ npx vitest run    # una sola corrida
 
 ## Próximos pasos
 
-- Favoritos persistentes por usuario (guardarlos en Firestore).
+- Favoritos sincronizados entre dispositivos (guardarlos en Firestore por usuario).
+- Subida de imágenes desde el panel de admin (Firebase Storage).
 - Generar las órdenes desde una Cloud Function para validar precios y stock del lado del servidor.
