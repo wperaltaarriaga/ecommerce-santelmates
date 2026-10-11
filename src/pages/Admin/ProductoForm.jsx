@@ -8,7 +8,8 @@ const OPCIONES_CATEGORIA = categorias.flatMap((c) => [
   ...c.subcategorias.map((sub) => ({ valor: sub, etiqueta: `${c.nombre} › ${sub}` }))
 ])
 
-const PRODUCTO_VACIO = { name: '', category: '', price: '', stock: '', img: '', description: '' }
+const PRODUCTO_VACIO = { name: '', category: '', price: '', stock: '', imagenes: [''], description: '' }
+export const MAX_IMAGENES = 8
 
 // Mismos límites que las reglas de Firestore, así el error se ve acá y no como un "permission-denied"
 function validarProducto(datos) {
@@ -20,8 +21,12 @@ function validarProducto(datos) {
   if (datos.stock === '' || !Number.isInteger(Number(datos.stock)) || Number(datos.stock) < 0) {
     errores.stock = 'El stock tiene que ser un número entero, 0 o más.'
   }
-  if (!datos.img.trim()) errores.img = 'Indicá la imagen.'
-  else if (datos.img.trim().length > 300) errores.img = 'Máximo 300 caracteres.'
+  const imagenes = datos.imagenes.map((i) => i.trim()).filter(Boolean)
+  if (imagenes.length === 0) errores.imagenes = 'Agregá al menos una imagen.'
+  else if (imagenes.some((i) => i.length > 300)) errores.imagenes = 'Cada link puede tener hasta 300 caracteres.'
+  else if (imagenes.some((i) => /^https?:\/\/ibb\.co\//.test(i))) {
+    errores.imagenes = 'Los links de ibb.co son la página, no la foto. Usá el "enlace directo" (empieza con https://i.ibb.co/).'
+  }
   if (datos.description.length > 1000) errores.description = 'Máximo 1000 caracteres.'
   return errores
 }
@@ -37,7 +42,8 @@ function ProductoForm({ producto, imagenesConocidas = [], onGuardar, onCancelar 
           category: producto.category,
           price: String(producto.price),
           stock: String(producto.stock),
-          img: producto.img,
+          // Productos viejos solo tienen `img`; los nuevos guardan todas en `imgs` (la principal primero)
+          imagenes: producto.imgs?.length ? [...producto.imgs] : [producto.img],
           description: producto.description ?? ''
         }
       : PRODUCTO_VACIO
@@ -51,6 +57,17 @@ function ProductoForm({ producto, imagenesConocidas = [], onGuardar, onCancelar 
     setErrores((prev) => ({ ...prev, [campo]: undefined }))
   }
 
+  // ----- Lista de imágenes -----
+  const actualizarImagenes = (cambiar) => {
+    setDatos((prev) => ({ ...prev, imagenes: cambiar([...prev.imagenes]) }))
+    setErrores((prev) => ({ ...prev, imagenes: undefined }))
+  }
+  const cambiarImagen = (i, valor) => actualizarImagenes((lista) => { lista[i] = valor; return lista })
+  const agregarImagen = () => actualizarImagenes((lista) => [...lista, ''])
+  const quitarImagen = (i) => actualizarImagenes((lista) => (lista.length > 1 ? lista.filter((_, j) => j !== i) : ['']))
+  // La principal es siempre la primera de la lista
+  const hacerPrincipal = (i) => actualizarImagenes((lista) => [lista[i], ...lista.filter((_, j) => j !== i)])
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError(null)
@@ -60,13 +77,15 @@ function ProductoForm({ producto, imagenesConocidas = [], onGuardar, onCancelar 
       return
     }
     setGuardando(true)
+    const imagenes = datos.imagenes.map((i) => i.trim()).filter(Boolean)
     try {
       await onGuardar({
         name: datos.name.trim(),
         category: datos.category,
         price: Number(datos.price),
         stock: Number(datos.stock),
-        img: datos.img.trim(),
+        img: imagenes[0], // la principal: la usan la card, el carrito y el checkout
+        imgs: imagenes,
         description: datos.description.trim()
       })
     } catch {
@@ -105,30 +124,55 @@ function ProductoForm({ producto, imagenesConocidas = [], onGuardar, onCancelar 
               <input id="prod-stock" type="number" min="0" step="1" className={styles.formInput} value={datos.stock} onChange={handleChange('stock')} />, 'stock')}
           </div>
 
-          {campo('prod-img', 'Imagen',
-            <>
-              <input
-                id="prod-img"
-                className={styles.formInput}
-                value={datos.img}
-                onChange={handleChange('img')}
-                placeholder="/imagenes/mateGrande.jpg o https://..."
-                list="imagenes-conocidas"
-              />
-              <datalist id="imagenes-conocidas">
-                {imagenesConocidas.map((ruta) => <option key={ruta} value={ruta} />)}
-              </datalist>
-              <p className={styles.formHint}>
-                Ruta de una imagen de la carpeta <code>public/</code> o una URL completa.
-              </p>
-            </>, 'img')}
+          <fieldset className={styles.imagenesFieldset}>
+            <legend className={styles.formLabel}>Imágenes</legend>
+            {datos.imagenes.map((url, i) => (
+              <div key={i} className={styles.imagenFila}>
+                <div className={styles.imagenThumb}>
+                  {url.trim() ? <img src={url.trim()} alt="" /> : <span>{i + 1}</span>}
+                </div>
+                <label htmlFor={`prod-img-${i}`} className={styles.srOnly}>Imagen {i + 1}</label>
+                <input
+                  id={`prod-img-${i}`}
+                  className={styles.formInput}
+                  value={url}
+                  onChange={(e) => cambiarImagen(i, e.target.value)}
+                  placeholder="https://i.ibb.co/... o /imagenes/..."
+                  list="imagenes-conocidas"
+                />
+                {i === 0 ? (
+                  <span className={styles.principalBadge} title="Imagen principal">★</span>
+                ) : (
+                  <button type="button" className={styles.iconButton} onClick={() => hacerPrincipal(i)} title="Hacer principal" aria-label={`Hacer principal la imagen ${i + 1}`}>
+                    ☆
+                  </button>
+                )}
+                <button type="button" className={styles.iconButton} onClick={() => quitarImagen(i)} title="Quitar" aria-label={`Quitar imagen ${i + 1}`}>
+                  ✕
+                </button>
+              </div>
+            ))}
+            <datalist id="imagenes-conocidas">
+              {imagenesConocidas.map((ruta) => <option key={ruta} value={ruta} />)}
+            </datalist>
+            {datos.imagenes.length < MAX_IMAGENES && (
+              <button type="button" className={styles.addImageButton} onClick={agregarImagen}>
+                + Agregar imagen
+              </button>
+            )}
+            <p className={styles.formHint}>
+              La ★ es la principal (la que se ve en el catálogo). Hasta {MAX_IMAGENES} imágenes: link directo
+              (ej. <code>https://i.ibb.co/...</code>) o ruta de <code>public/</code>.
+            </p>
+            {errores.imagenes && <p className={styles.fieldError}>{errores.imagenes}</p>}
+          </fieldset>
         </div>
 
         <div className={styles.formColumn}>
           <div className={styles.imgPreview}>
-            {datos.img.trim()
-              ? <img src={datos.img.trim()} alt="Vista previa" />
-              : <span>Vista previa de la imagen</span>}
+            {datos.imagenes[0]?.trim()
+              ? <img src={datos.imagenes[0].trim()} alt="Vista previa de la imagen principal" />
+              : <span>Vista previa de la imagen principal</span>}
           </div>
         </div>
       </div>

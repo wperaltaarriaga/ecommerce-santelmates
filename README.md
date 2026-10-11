@@ -100,6 +100,7 @@ src/
 │       ├── ItemDetailContainer.jsx  # Usa useProductDetail(id); renderiza ItemDetail + ProductCarousel
 │       ├── Breadcrumbs/              # Migas de pan (Catálogo / Categoría / Producto)
 │       ├── ItemDetail/               # Vista completa del producto
+│       ├── Galeria/                  # Foto grande + miniaturas, flechas y swipe (si hay varias imágenes)
 │       └── ItemCount/                # Selector de cantidad (reutilizable)
 └── pages/
     ├── Home/                        # Hero + catálogo + carrusel
@@ -214,6 +215,7 @@ Los tres Providers envuelven el `BrowserRouter` en `App.jsx`. Los objetos de con
 - **`ItemDetailContainer`**: usa `useProductDetail(id)`, maneja `loading`/`error`, y renderiza `ItemDetail` junto con un `ProductCarousel` de productos relacionados.
 - **`ItemCount`**: muestra el stock disponible y no deja elegir más de lo que queda (descuenta lo que ya está en el carrito). Si no hay stock, muestra un aviso en vez del selector. El `CartContext` también limita las cantidades al stock, y los botones `+` del carrito se deshabilitan al llegar al máximo.
 - **`ProductInfo`**: componente compartido entre `Item`, `ItemDetail` y `ProductCarousel`.
+- **`Galeria`**: en el detalle, foto grande con miniaturas, flechas y deslizamiento táctil. Usa el campo `imgs` del producto (lista, la principal primero); los productos que solo tienen `img` se ven con una sola foto, como antes. `img` se sigue guardando como foto principal porque la usan la card, el carrito, el checkout y Mis compras.
 
 ## Página del carrito (`Cart.jsx`)
 
@@ -250,7 +252,7 @@ firebase deploy --only firestore:rules
 Resumen de lo que validan:
 
 - **Roles**: existe un rol `admin`, asignado como *custom claim* desde el Admin SDK (`admin.auth().setCustomUserClaims(uid, { admin: true })`). Las reglas lo leen con `request.auth.token.admin == true`.
-- **`products`**: lectura pública. Solo un admin puede crear/editar/borrar, y al crear o editar se valida la forma del documento (campos permitidos, `price > 0`, `stock` entero `>= 0`, largos de texto). Un comprador logueado solo puede **bajar** el `stock` (nunca subirlo ni tocar otro campo), y únicamente si en `lastOrderId` indica una orden suya que se está creando en esa misma transacción (`existsAfter` / `getAfter`).
+- **`products`**: lectura pública. Solo un admin puede crear/editar/borrar, y al crear o editar se valida la forma del documento (campos permitidos, `price > 0`, `stock` entero `>= 0`, largos de texto, `imgs` opcional con 1 a 8 imágenes). Un comprador logueado solo puede **bajar** el `stock` (nunca subirlo ni tocar otro campo), y únicamente si en `lastOrderId` indica una orden suya que se está creando en esa misma transacción (`existsAfter` / `getAfter`).
 - **`orders`**:
   - Crear: con sesión activa, a nombre propio (`userId == request.auth.uid` y `userEmail` igual al email del token), con exactamente los campos esperados, datos del comprador válidos, entre 1 y 50 productos, `total > 0` y `createdAt == request.time` (obliga a usar `serverTimestamp()`).
   - Leer: cada usuario solo sus órdenes; el admin puede leer todas.
@@ -273,7 +275,8 @@ npx vitest run    # una sola corrida
 - `src/context/CartContext.test.jsx`: lógica del carrito (agregar sin duplicar, sumar cantidades, totales, límite de stock, `updateQuantity` a 0, `removeItem`, `clear`, toast, persistencia en `localStorage` y error fuera del Provider).
 - `src/pages/Checkout/Checkout.test.jsx`: flujo de compra con Firebase mockeado (loader de sesión, carrito vacío, sin sesión, validación de campos, creación de la orden con los datos correctos, y que el carrito **no** se vacíe si Firestore falla o falta stock).
 - `src/context/FavoritesContext.test.jsx`: agregar/quitar favoritos y persistencia en `localStorage`.
-- `src/pages/Admin/ProductoForm.test.jsx`: validación del formulario de productos y conversión de números.
+- `src/pages/Admin/ProductoForm.test.jsx`: validación del formulario de productos, conversión de números, varias imágenes con principal y rechazo de links de página de ibb.co.
+- `src/components/ItemDetailContainer/Galeria/Galeria.test.jsx`: flechas, miniaturas y swipe de la galería.
 - `src/services/firebaseOrders.test.js`: la transacción de `crearOrden` (descuenta el stock de cada producto, y si a uno no le alcanza no escribe nada).
 
 ## Notas importantes
@@ -298,7 +301,7 @@ npx vitest run    # una sola corrida
 ## Mis compras y panel de admin
 
 - **`/mis-compras`**: lista las órdenes del usuario logueado (`where('userId', '==', uid)`), de la más nueva a la más vieja, con fecha, productos, total y dirección de entrega.
-- **`/admin`**: solo para usuarios con el custom claim `admin` (se asigna con `node scripts/hacerAdmin.mjs email`, ver más abajo). Tiene dos pestañas: **Órdenes** (todas, con datos del cliente y total vendido) y **Productos**: precio y stock se editan directo en la tabla, y con **+ Nuevo producto** / **Editar** se abre un formulario con todos los campos (nombre, categoría, precio, stock, imagen con vista previa y descripción). También se pueden **eliminar** productos. El formulario valida con los mismos límites que las reglas de Firestore, y `categoryPath` se recalcula solo al cambiar la categoría. Las reglas de Firestore son las que realmente protegen estos datos: aunque alguien entre a `/admin`, sin el claim Firestore rechaza las lecturas y escrituras.
+- **`/admin`**: solo para usuarios con el custom claim `admin` (se asigna con `node scripts/hacerAdmin.mjs email`, ver más abajo). Tiene dos pestañas: **Órdenes** (todas, con datos del cliente y total vendido) y **Productos**: precio y stock se editan directo en la tabla, y con **+ Nuevo producto** / **Editar** se abre un formulario con todos los campos (nombre, categoría, precio, stock, **hasta 8 imágenes** con vista previa —la marcada con ★ es la principal— y descripción). También se pueden **eliminar** productos. El formulario valida con los mismos límites que las reglas de Firestore, y `categoryPath` se recalcula solo al cambiar la categoría. Las reglas de Firestore son las que realmente protegen estos datos: aunque alguien entre a `/admin`, sin el claim Firestore rechaza las lecturas y escrituras.
 
 ### Cómo crear un admin
 

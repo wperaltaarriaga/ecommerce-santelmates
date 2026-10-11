@@ -20,14 +20,16 @@ service cloud.firestore {
 
     // ---------- Validaciones de productos ----------
 
+    // imgs es opcional (productos viejos no lo tienen): lista de 1 a 8 imágenes
     function esProductoValido(p) {
       return p.keys().hasAll(['name', 'price', 'category', 'categoryPath', 'img', 'stock', 'description'])
-        && p.keys().hasOnly(['name', 'price', 'category', 'categoryPath', 'img', 'stock', 'description', 'lastOrderId'])
+        && p.keys().hasOnly(['name', 'price', 'category', 'categoryPath', 'img', 'imgs', 'stock', 'description', 'lastOrderId'])
         && esTextoValido(p.name, 1, 100)
         && p.price is number && p.price > 0
         && esTextoValido(p.category, 1, 50)
         && p.categoryPath is list
         && esTextoValido(p.img, 1, 300)
+        && (!('imgs' in p) || (p.imgs is list && p.imgs.size() >= 1 && p.imgs.size() <= 8))
         && p.stock is int && p.stock >= 0
         && esTextoValido(p.description, 0, 1000);
     }

@@ -388,3 +388,82 @@
     padding: 18px;
   }
 }
+
+/* ---------- Lista de imágenes del formulario ---------- */
+
+.imagenesFieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.imagenFila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.imagenThumb {
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.imagenThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.iconButton,
+.principalBadge {
+  flex: 0 0 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 16px;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background-color: var(--color-border);
+  color: var(--color-ink);
+}
+
+.principalBadge {
+  color: #c99a2e;
+  cursor: default;
+  font-size: 18px;
+}
+
+.addImageButton {
+  align-self: flex-start;
+  background: none;
+  border: 1px dashed var(--color-border-light);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.addImageButton:hover {
+  border-color: var(--color-muted-light);
+}
