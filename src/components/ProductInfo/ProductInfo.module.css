@@ -30,3 +30,12 @@
   margin: 0;
   max-width: 420px;
 }
+/* En las cards (catálogo y carrusel) la descripción se corta a 2 líneas con "…";
+   completa solo se ve en el detalle (variant="detail") */
+.info:not(.detail) .description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
