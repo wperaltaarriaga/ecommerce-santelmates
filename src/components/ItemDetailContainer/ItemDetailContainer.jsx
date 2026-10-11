@@ -28,7 +28,7 @@ function ItemDetailContainer() {
   return (
     <div>
       <ItemDetail producto={producto} />
-      <ProductCarousel currentProductId={id} category={producto.category} />
+      <ProductCarousel currentProductId={id} />
     </div>
   )
 }

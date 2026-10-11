@@ -81,20 +81,6 @@
   border-color: var(--color-muted-light);
 }
 
-.allItem {
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-ink);
-  border-radius: 999px;
-  transition: all 0.2s ease;
-}
-
-.allActive {
-  background-color: var(--color-white);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-}
-
 .divider {
   width: 1px;
   height: 18px;

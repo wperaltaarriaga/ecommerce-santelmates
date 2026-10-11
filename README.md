@@ -40,13 +40,9 @@ npm run dev
 
 La app queda disponible en `http://localhost:5173`.
 
-### Cargar el catálogo por primera vez
+### Cargar productos
 
-El catálogo vive en Firestore, no en el código. Para poblarlo, `src/firebase/seedProduts.js` exporta una función `seedProducts()` que sube el array de productos definido ahí mismo, usando `addDoc` (Firestore genera el ID de cada documento automáticamente). Para correrla una vez:
-
-1. En `main.jsx`, descomentá temporalmente el `import` y la llamada a `seedProducts()`.
-2. Corré `npm run dev`, recargá la página y mirá la consola del navegador — vas a ver un log por cada producto cargado.
-3. Volvé a comentar esas dos líneas (si no, cada recarga vuelve a duplicar los productos, porque `addDoc` siempre crea documentos nuevos).
+El catálogo vive en Firestore, no en el código. Los productos se crean, editan y eliminan desde el **panel de admin** (`/admin` → pestaña Productos), con un usuario que tenga el rol admin (ver **Cómo crear un admin** más abajo).
 
 ## Estructura del proyecto
 
@@ -55,8 +51,7 @@ src/
 ├── App.jsx                          # Layout raíz: Providers + BrowserRouter + Routes
 ├── main.jsx                         # Punto de entrada (renderiza <App />)
 ├── firebase/
-│   ├── config.js                    # Inicializa Firebase, exporta `db` (Firestore) y `auth` (Authentication)
-│   └── seedProduts.js               # Carga inicial del catálogo a Firestore (addDoc, se corre una sola vez)
+│   └── config.js                    # Inicializa Firebase, exporta `db` (Firestore) y `auth` (Authentication)
 ├── services/
 │   ├── firebaseProducts.js          # getProducts, getProductById y updateProducto (admin) contra Firestore
 │   └── firebaseOrders.js            # crearOrden (transacción que descuenta stock), órdenes por usuario y todas (admin)
@@ -66,7 +61,6 @@ src/
 │   ├── slugify.js                   # Normaliza texto a formato de URL (minúsculas, sin acentos, guiones)
 │   └── categoryPath.js              # Calcula el array de tags de categoría de un producto (categoryPathFor)
 ├── hooks/
-│   ├── useFetch.js                  # Hook genérico de fetch a una URL (sin uso actual)
 │   ├── useProducts.js               # Trae el listado de productos desde Firestore
 │   ├── useProductDetail.js          # Trae un producto por id desde Firestore
 │   ├── useAuth.js                   # Lee el AuthContext
@@ -170,7 +164,6 @@ Expone `user`, `isAdmin`, `loading`, `register(email, password)`, `login(email, 
 
 - **`useProducts(categoryId)`**: trae el listado de productos desde Firestore (filtrado por categoría si corresponde). Devuelve `{ products, loading, error }`.
 - **`useProductDetail(id)`**: trae un producto puntual por id desde Firestore. Devuelve `{ producto, loading, error }`.
-- **`useFetch`**: hook genérico de fetch a una URL, sin uso actual en el proyecto.
 
 Encapsular esta lógica en hooks separa el "cómo se consiguen los datos" del "cómo se muestran": los containers (`ItemListContainer`, `ItemDetailContainer`) solo llaman al hook correspondiente y quedan enfocados en el renderizado.
 
@@ -261,8 +254,6 @@ Resumen de lo que validan:
 
 Limitaciones: las reglas no pueden recorrer listas, así que solo se valida el primer ítem de `items` como muestra; tampoco pueden verificar que el `total` coincida con los precios reales del catálogo, ni que lo descontado de stock coincida exactamente con las cantidades de la orden. Para eso haría falta generar la orden desde una Cloud Function.
 
-> Ojo: `seedProducts()` escribe desde el cliente, así que para correrlo hay que estar logueado con un usuario `admin`.
-
 ## Testing
 
 Tests con **Vitest** + **React Testing Library** (entorno `jsdom`):
@@ -309,6 +300,8 @@ npx vitest run    # una sola corrida
 2. Guardar el archivo como `serviceAccountKey.json` en la raíz (está en `.gitignore`, **nunca subirlo**).
 3. `node scripts/hacerAdmin.mjs email@ejemplo.com`
 4. Cerrar sesión y volver a entrar para que el token incluya el rol.
+
+Para cuentas de prueba con emails ficticios (que no pueden recibir el email de reseteo), `node scripts/cambiarPassword.mjs email@ejemplo.com` pide una contraseña nueva por teclado y la asigna directo con el Admin SDK.
 
 ## Próximos pasos
 

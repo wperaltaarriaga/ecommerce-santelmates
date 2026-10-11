@@ -123,7 +123,7 @@ export default function FlipCard({
 
   const onPointerDown = e => {
     if (disabled || e.button !== 0 || grip.current) return;
-    if (e.target.closest('a, button, [data-no-flip]')) return; // 👈 no flipear si el click arranca en un link/botón
+    if (e.target.closest('a, button, [data-no-flip]')) return; // no flipear si el click arranca en un link/botón
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
@@ -202,7 +202,7 @@ export default function FlipCard({
     if (!e.repeat) flip(true);
   };
   const onClick = e => {
-    if (disabled || e.target.closest('a, button, [data-no-flip]')) return; // 👈 mismo chequeo acá
+    if (disabled || e.target.closest('a, button, [data-no-flip]')) return; // mismo chequeo que en onPointerDown
     if (e.detail === 0) flip(true);
   };
 
