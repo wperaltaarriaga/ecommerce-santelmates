@@ -1,5 +1,6 @@
 .footer {
-  border-top: 1px solid var(--color-border);
+  background-color: var(--color-yerba);
+  color: var(--color-crema);
   padding: 56px 40px 24px;
   margin-top: 40px;
 }
@@ -20,14 +21,14 @@
 
 .brandName {
   font-family: 'Parisienne', cursive;
-  font-size: 28px;
-  color: var(--color-ink);
+  font-size: 30px;
+  color: var(--color-crema);
   margin-bottom: 8px;
 }
 
 .tagline {
   font-size: 14px;
-  color: var(--color-muted-lighter);
+  color: rgba(242, 241, 233, 0.7);
   line-height: 1.6;
   margin: 0;
   max-width: 240px;
@@ -44,23 +45,23 @@
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--color-muted-light);
+  color: var(--color-lima);
   margin: 0 0 4px;
 }
 
 .link {
   font-size: 14px;
-  color: var(--color-muted);
+  color: rgba(242, 241, 233, 0.8);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .link:hover {
-  color: var(--color-ink);
+  color: var(--color-white);
 }
 
 .bottom {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid rgba(242, 241, 233, 0.15);
   padding-top: 20px;
   max-width: 1100px;
   margin: 0 auto;
@@ -68,7 +69,7 @@
 
 .copy {
   font-size: 12px;
-  color: var(--color-muted-light);
+  color: rgba(242, 241, 233, 0.55);
   margin: 0;
   text-align: center;
 }

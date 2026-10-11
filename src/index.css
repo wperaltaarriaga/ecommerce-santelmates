@@ -1,24 +1,40 @@
 :root {
-    --color-ink: #111;
-    --color-white: #fff;
-    --color-border: #ececec;
-    --color-border-light: #ddd;
-    --color-divider: #ccc;
-    --color-muted: #666;
-    --color-muted-light: #999;
-    --color-muted-lighter: #888;
-    --color-dark: #333;
-    --color-bg-soft: #f0f0f0;
-    --color-bg-soft-2: #f4f4f4;
-    --color-bg-soft-3: #f9f9f9;
-    --color-danger: #e63946;
+    /* Paleta Santelmates: verde yerba + crema.
+       Los nombres se mantienen para no tener que tocar cada componente. */
+    --color-ink: #1f2f1b;          /* texto principal y botones oscuros (verde yerba muy oscuro) */
+    --color-white: #fff;           /* superficies: cards, inputs, paneles */
+    --color-border: #e4e2d6;
+    --color-border-light: #d6d3c4;
+    --color-divider: #c9c5b4;
+    --color-muted: #5e6358;
+    --color-muted-light: #8c8f84;
+    --color-muted-lighter: #7a7d72;
+    --color-dark: #33492c;         /* hover de botones oscuros */
+    --color-bg-soft: #ebe9df;
+    --color-bg-soft-2: #e9e7dc;    /* fondo de imágenes mientras cargan */
+    --color-bg-soft-3: #f7f6f0;
+    --color-danger: #c0392b;
+
+    --color-yerba: #24391f;
+    --color-yerba-claro: #3d5a34;
+    --color-crema: #f2f1e9;
+    --color-lima: #d9e77a;
+    --font-display: 'Archivo Black', system-ui, sans-serif;
   }
-  
+
   * {
     box-sizing: border-box;
   }
-  
+
   body {
     margin: 0;
     color: var(--color-ink);
+    background-color: var(--color-crema);
+  }
+
+  /* Títulos principales de cada página con la tipografía de la marca.
+     font-synthesis: none evita que el navegador "invente" una negrita sobre Archivo Black. */
+  h1 {
+    font-family: var(--font-display);
+    font-synthesis: none;
   }

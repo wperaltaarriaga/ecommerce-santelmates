@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import styles from './NavBar.module.css'
 import CartWidget from '../CartWidget/CartWidget'
 import FavoritesWidget from '../Favorite/FavoritesWidget/FavoritesWidget'
@@ -11,6 +11,15 @@ function NavBar({ busqueda, setBusqueda }) {
   const [menuAbierto, setMenuAbierto] = useState(null)
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false)
   const navRef = useRef(null)
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+
+  // La búsqueda filtra el catálogo: si se escribe desde otra página, se va a /productos
+  const buscar = (texto) => {
+    setBusqueda(texto)
+    const enCatalogo = pathname === '/productos' || pathname.startsWith('/category/')
+    if (texto && !enCatalogo) navigate('/productos')
+  }
 
   useEffect(() => {
     const cerrarSiEsAfuera = (e) => {
@@ -57,10 +66,6 @@ function NavBar({ busqueda, setBusqueda }) {
         <span />
       </button>
 
-      <NavLink to="/" className={styles.brand}>
-        <h1 className={styles.brandName}>Santel Mates</h1>
-      </NavLink>
-
       <div className={styles.pillNav} ref={navRef}>
         <NavLink
           to="/productos"
@@ -69,7 +74,6 @@ function NavBar({ busqueda, setBusqueda }) {
         >
           Todos
         </NavLink>
-        <span className={styles.divider} />
         {categorias.map((categoria) => (
           <div
             key={categoria.nombre}
@@ -102,6 +106,10 @@ function NavBar({ busqueda, setBusqueda }) {
         ))}
       </div>
 
+      <NavLink to="/" className={styles.brand}>
+        <h1 className={styles.brandName}>Santel Mates</h1>
+      </NavLink>
+
       <div className={styles.rightSide}>
         <input
           type="search"
@@ -109,7 +117,7 @@ function NavBar({ busqueda, setBusqueda }) {
           aria-label="Buscar productos"
           className={`${styles.searchInput} ${styles.soloEscritorio}`}
           value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
+          onChange={(e) => buscar(e.target.value)}
         />
         <div className={styles.soloEscritorio}>
           <AuthWidget />
@@ -142,7 +150,7 @@ function NavBar({ busqueda, setBusqueda }) {
               aria-label="Buscar productos"
               className={styles.mobileSearch}
               value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
+              onChange={(e) => buscar(e.target.value)}
             />
 
             <div className={styles.mobileLinks}>
