@@ -1,0 +1,268 @@
+.vitrina {
+  touch-action: pan-y; /* el deslizamiento lateral lo maneja la vitrina */
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(var(--columnas), minmax(0, 1fr));
+  gap: 20px;
+  align-items: center;
+  padding: 28px 0;
+}
+
+/* ---------- Tarjetas apagadas de los costados ---------- */
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px 16px 22px;
+  border: none;
+  border-radius: 24px;
+  background-color: var(--color-bg-soft-2);
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  animation: aparecer 0.35s ease;
+}
+
+.tarjeta:hover {
+  opacity: 1;
+  transform: translateY(-3px);
+}
+
+.foto {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background-color: var(--color-bg-soft);
+}
+
+.foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.75);
+}
+
+.nombre {
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--color-muted);
+}
+
+.precio {
+  font-size: 14px;
+  color: var(--color-muted-light);
+}
+
+/* ---------- Tarjeta destacada ---------- */
+
+.destacada {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 22px 24px;
+  border-radius: 28px;
+  color: var(--color-crema);
+  background-color: var(--color-yerba-claro);
+  /* trama sutil de puntitos, como la tela de las tarjetas de la referencia */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+  box-shadow: 0 24px 48px rgba(31, 47, 27, 0.28);
+  transform: scale(1.06);
+  z-index: 1;
+  animation: destacar 0.35s ease;
+}
+
+.fotoDestacada {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background-color: var(--color-yerba);
+}
+
+.fotoDestacada img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-yerba);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.anterior {
+  left: 10px;
+}
+
+.siguiente {
+  right: 10px;
+}
+
+.categoria {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-lima);
+  margin-bottom: 4px;
+}
+
+.nombreDestacado {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--color-white);
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+
+.nombreDestacado:hover {
+  color: var(--color-lima);
+}
+
+.descripcion {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(242, 241, 233, 0.8);
+  margin: 0 0 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.datos {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-top: 1px solid rgba(242, 241, 233, 0.15);
+  font-size: 14px;
+}
+
+.datos span {
+  color: rgba(242, 241, 233, 0.6);
+}
+
+.botonAgregar {
+  margin-top: 16px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-white);
+  color: var(--color-yerba);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.botonAgregar:hover:not(:disabled) {
+  background-color: var(--color-lima);
+}
+
+.botonAgregar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.verDetalle {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(242, 241, 233, 0.8);
+}
+
+.verDetalle:hover {
+  color: var(--color-white);
+}
+
+/* ---------- Puntitos de posición ---------- */
+
+.puntos {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: var(--color-border-light);
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.puntoActivo {
+  width: 20px;
+  background-color: var(--color-yerba);
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes destacar {
+  from { opacity: 0.6; transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+/* ---------- Tablet y celular ---------- */
+
+@media (max-width: 1024px) {
+  /* Se ven la destacada y una al costado */
+  .fila {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+
+  .fila > :nth-child(1):not(.destacada),
+  .fila > .destacada ~ :nth-child(n + 4) {
+    display: none;
+  }
+
+  .destacada {
+    transform: scale(1.02);
+  }
+}
+
+@media (max-width: 640px) {
+  /* Solo la destacada, a todo el ancho */
+  .fila {
+    grid-template-columns: 1fr;
+    padding: 12px 0 20px;
+  }
+
+  .fila > .tarjeta {
+    display: none;
+  }
+
+  .destacada {
+    transform: none;
+    animation: aparecer 0.3s ease;
+  }
+}

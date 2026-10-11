@@ -1,58 +1,233 @@
 .home {
+  background-color: var(--color-crema);
+  padding-bottom: 20px;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
   position: relative;
+  min-height: min(78vh, 720px);
+  padding: 56px 48px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 520px;
-  padding: 40px 24px;
-  border-radius: 24px;
-  margin: 24px;
-  overflow: hidden;
-  background-image: url('https://i.ibb.co/HLxWtS0G/DSC-0290.jpg');
+  align-items: flex-start;
+  background-image:
+    linear-gradient(180deg, rgba(20, 28, 18, 0.55) 0%, rgba(20, 28, 18, 0.15) 45%, rgba(20, 28, 18, 0) 70%),
+    url('https://i.ibb.co/r2YszWv6/DSC-0298.jpg');
   background-size: cover;
   background-position: center;
 }
 
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(20, 20, 30, 0.55) 0%, rgba(20, 20, 30, 0.75) 100%);
+.heroContenido {
+  max-width: 860px;
 }
 
-.content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 720px;
-}
-
-.greeting {
-  font-size: 56px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -1.5px;
+.heroTitulo {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.6vw, 60px);
+  line-height: 1.02;
+  text-transform: uppercase;
   color: var(--color-white);
-  margin: 0 0 24px;
+  margin: 0 0 28px;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.25);
 }
 
-.subtext {
-  font-size: 17px;
-  color: #e8e8e8;
-  max-width: 520px;
-  margin: 0;
-  line-height: 1.5;
+.heroBoton {
+  display: inline-block;
+  min-width: 240px;
+  text-align: center;
+  background-color: var(--color-white);
+  color: var(--color-yerba);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 999px;
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
-.catalogSection {
-  padding: 60px 40px 20px;
+
+.heroBoton:hover {
+  color: var(--color-yerba);
+  background-color: var(--color-lima);
+  transform: translateY(-1px);
+}
+
+/* ---------- Beneficios ---------- */
+
+.beneficios {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px 32px;
   text-align: center;
 }
 
-.catalogTitle {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--color-ink);
-  margin: 0 0 40px;
+.beneficioIcono {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  color: var(--color-yerba);
+  margin-bottom: 12px;
+}
+
+.beneficioIcono svg {
+  width: 100%;
+  height: 100%;
+}
+
+.beneficioTitulo {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-yerba);
+  margin: 0 0 8px;
+}
+
+.beneficioTexto {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-muted);
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* ---------- Productos ---------- */
+
+.productos {
+  position: relative;
+  max-width: 1280px;
+  margin: 0 auto 32px;
+  padding: 40px 48px 36px;
+  background-color: var(--color-white);
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+/* Círculo decorativo de fondo, como en la referencia */
+.productos::before {
+  content: '';
+  position: absolute;
+  width: 560px;
+  height: 560px;
+  top: -260px;
+  right: 8%;
+  border-radius: 50%;
+  background-color: var(--color-crema);
+  pointer-events: none;
+}
+
+.productosHeader,
+.productos > :not(.productosHeader) {
+  position: relative; /* por encima del círculo */
+}
+
+.productosHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.seccionTitulo {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.4vw, 40px);
+  text-transform: uppercase;
+  color: var(--color-yerba);
+  margin: 0;
+}
+
+.verTodos {
+  background-color: var(--color-yerba);
+  color: var(--color-crema);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 11px 22px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.verTodos:hover {
+  color: var(--color-crema);
+  background-color: var(--color-yerba-claro);
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 16px;
+  padding: 28px 0;
+}
+
+.cardSkeleton {
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #e9e8df 25%, #f4f3ec 50%, #e9e8df 75%);
+  background-size: 200% 100%;
+  animation: brillo 1.4s ease-in-out infinite;
+}
+
+@keyframes brillo {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .grilla {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .productos {
+    margin: 0 16px 24px;
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: 70vh;
+    padding: 36px 20px;
+  }
+
+  .heroBoton {
+    min-width: 0;
+  }
+
+  .beneficios {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 48px 24px;
+  }
+
+  .productos {
+    margin: 0 12px 20px;
+    padding: 24px 16px;
+    border-radius: 24px;
+  }
+
+  .productos::before {
+    width: 260px;
+    height: 260px;
+    top: -150px;
+    right: -60px;
+  }
+
+  .grilla {
+    gap: 18px 12px;
+  }
 }
