@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useState, lazy, Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import styles from './App.module.css'
 import { CartProvider } from './context/CartContext'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { AuthProvider } from './context/AuthContext'
 
+import BarraAnuncio from './components/BarraAnuncio/BarraAnuncio.jsx'
 import NavBar from './components/NavBar/NavBar.jsx'
 import Footer from './components/Footer/Footer.jsx'
 import CartDrawer from './components/CartDrawer/CartDrawer.jsx'
 import Toast from './components/Toast/Toast.jsx'
+import BotonWhatsApp from './components/BotonWhatsApp/BotonWhatsApp.jsx'
 import Home from './pages/Home/Home.jsx'
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx'
 
@@ -40,6 +43,7 @@ function App() {
         <FavoritesProvider>
           <BrowserRouter>
             <div className={styles.page}>
+              <BarraAnuncio />
               <NavBar busqueda={busqueda} setBusqueda={setBusqueda} />
               <CartDrawer />
               <Toast />
@@ -47,7 +51,7 @@ function App() {
                 <RutasConProteccion>
                   <Suspense fallback={<div className={styles.pageLoader}><span className={styles.spinner} /></div>}>
                     <Routes>
-                      <Route path="/" element={<Home busqueda={busqueda} />} />
+                      <Route path="/" element={<Home />} />
                       <Route path="/productos" element={<ItemListContainer busqueda={busqueda} />} />
                       <Route path="/category/:categoryId" element={<ItemListContainer busqueda={busqueda} />} />
                       <Route path="/item/:id" element={<ItemDetailContainer />} />
@@ -65,6 +69,9 @@ function App() {
                 </RutasConProteccion>
               </main>
               <Footer />
+              <BotonWhatsApp />
+              {/* Estadísticas de visitas de Vercel (solo mide en el sitio publicado) */}
+              <Analytics />
             </div>
           </BrowserRouter>
         </FavoritesProvider>

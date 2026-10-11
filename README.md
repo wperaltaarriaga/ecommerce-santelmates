@@ -249,7 +249,8 @@ Resumen de lo que validan:
 - **`orders`**:
   - Crear: con sesión activa, a nombre propio (`userId == request.auth.uid` y `userEmail` igual al email del token), con exactamente los campos esperados, datos del comprador válidos, entre 1 y 50 productos, `total > 0` y `createdAt == request.time` (obliga a usar `serverTimestamp()`).
   - Leer: cada usuario solo sus órdenes; el admin puede leer todas.
-  - Editar / borrar: nunca desde el cliente.
+  - Editar: solo el admin, y solo el campo `estado` (con uno de los valores permitidos).
+  - Borrar: nunca desde el cliente.
 - **Cualquier otra colección**: cerrada por defecto.
 
 Limitaciones: las reglas no pueden recorrer listas, así que solo se valida el primer ítem de `items` como muestra; tampoco pueden verificar que el `total` coincida con los precios reales del catálogo, ni que lo descontado de stock coincida exactamente con las cantidades de la orden. Para eso haría falta generar la orden desde una Cloud Function.
@@ -276,6 +277,15 @@ npx vitest run    # una sola corrida
 - El catálogo y las órdenes son datos reales en Cloud Firestore, no simulados.
 - `.env` nunca se sube al repositorio (está en `.gitignore`); `.env.example` documenta los nombres de las variables necesarias sin sus valores.
 
+## Diseño, contacto y estadísticas
+
+- **Paleta verde yerba + crema** en todo el sitio, definida como variables en `index.css` (`--color-ink`, `--color-yerba`, `--color-crema`, `--color-lima`…). Los títulos principales (`h1`) usan **Archivo Black**; la marca, **Parisienne**. Bootstrap se importa antes que `index.css` para que los estilos propios le ganen.
+- **Navbar**: categorías a la izquierda, logo al centro, buscador/cuenta/favoritos/carrito a la derecha. Queda fija arriba al scrollear (`position: sticky`).
+- **Home**: hero con título grande y botón, fila de beneficios con íconos SVG, sección **Mates Parsecs** (`CATEGORIA_DESTACADA`), sección **Productos** (el resto del catálogo) y el carrusel. Las dos secciones de productos usan **`Vitrina`** (`pages/Home/Vitrina.jsx`): una tarjeta destacada en verde, más grande, con descripción, precio, stock y botón **Agregar al carrito** (respeta el stock), y las demás apagadas a los costados. Se navega con flechas, tocando una tarjeta o deslizando con el dedo. En tablet se ven 2 tarjetas y en el celular solo la destacada. Si se busca algo desde una página que no es el catálogo, el buscador lleva a `/productos`.
+- **Barra de anuncio** (`components/BarraAnuncio`): franja arriba de la navbar con un mensaje editable.
+- **Datos de contacto** en `src/data/contacto.js` (WhatsApp, email, Instagram). Los usan el footer y el **botón flotante de WhatsApp**; lo que queda vacío no se muestra. En el detalle de un producto, el mensaje de WhatsApp ya menciona el producto y su link.
+- **Vercel Analytics** (`<Analytics />` en `App.jsx`): mide visitas en el sitio publicado. Hay que activarlo una vez en el panel de Vercel (proyecto → Analytics → Enable).
+
 ## Mobile, SEO y vista previa al compartir
 
 - **Navbar en mobile y tablet (≤ 1024px)**: el menú de categorías se reemplaza por un botón ☰ que abre un panel lateral con buscador, todas las categorías y subcategorías, favoritos y la cuenta. Se cierra al tocar un link, el fondo o con Escape.
@@ -292,6 +302,7 @@ npx vitest run    # una sola corrida
 ## Mis compras y panel de admin
 
 - **`/mis-compras`**: lista las órdenes del usuario logueado (`where('userId', '==', uid)`), de la más nueva a la más vieja, con fecha, productos, total y dirección de entrega.
+- **Estado de las órdenes**: *Pendiente → Enviada → Entregada* (o *Cancelada*). El admin lo cambia desde la pestaña Órdenes (con filtros por estado y contador de pendientes) y el cliente lo ve en Mis compras. Las órdenes viejas sin el campo cuentan como pendientes. Las reglas solo dejan que el admin cambie el campo `estado`, y solo a uno de esos cuatro valores. Cancelar una orden **no** devuelve el stock automáticamente.
 - **`/admin`**: solo para usuarios con el custom claim `admin` (se asigna con `node scripts/hacerAdmin.mjs email`, ver más abajo). Tiene dos pestañas: **Órdenes** (todas, con datos del cliente y total vendido) y **Productos**: precio y stock se editan directo en la tabla, y con **+ Nuevo producto** / **Editar** se abre un formulario con todos los campos (nombre, categoría, precio, stock, **hasta 8 imágenes** con vista previa —la marcada con ★ es la principal— y descripción). También se pueden **eliminar** productos. El formulario valida con los mismos límites que las reglas de Firestore, y `categoryPath` se recalcula solo al cambiar la categoría. Las reglas de Firestore son las que realmente protegen estos datos: aunque alguien entre a `/admin`, sin el claim Firestore rechaza las lecturas y escrituras.
 
 ### Cómo crear un admin
