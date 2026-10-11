@@ -39,3 +39,13 @@
   line-clamp: 2;
   overflow: hidden;
 }
+
+/* Párrafos de la descripción en el detalle */
+.parrafo {
+  margin: 0 0 14px;
+  white-space: pre-line; /* un Enter simple dentro del párrafo se respeta como salto de línea */
+}
+
+.parrafo:last-child {
+  margin-bottom: 0;
+}

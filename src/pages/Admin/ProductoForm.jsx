@@ -9,7 +9,7 @@ const OPCIONES_CATEGORIA = categorias.flatMap((c) => [
 ])
 
 const PRODUCTO_VACIO = { name: '', category: '', price: '', stock: '', imagenes: [''], description: '' }
-export const MAX_IMAGENES = 8
+const MAX_IMAGENES = 8
 
 // Mismos límites que las reglas de Firestore, así el error se ve acá y no como un "permission-denied"
 function validarProducto(datos) {
@@ -178,7 +178,12 @@ function ProductoForm({ producto, imagenesConocidas = [], onGuardar, onCancelar 
       </div>
 
       {campo('prod-description', 'Descripción',
-        <textarea id="prod-description" rows={4} className={styles.formInput} value={datos.description} onChange={handleChange('description')} />, 'description')}
+        <>
+          <textarea id="prod-description" rows={7} className={styles.formInput} value={datos.description} onChange={handleChange('description')} />
+          <p className={styles.formHint}>
+            Para separar párrafos, dejá una línea en blanco (Enter dos veces). {datos.description.length}/1000
+          </p>
+        </>, 'description')}
 
       {error && <p className={styles.error} role="alert">{error}</p>}
 
