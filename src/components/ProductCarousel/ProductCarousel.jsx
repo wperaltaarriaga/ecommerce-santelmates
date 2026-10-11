@@ -11,9 +11,14 @@ function ProductCarousel({ title = 'También te puede interesar', currentProduct
 
   useEffect(() => {
     const fetchItems = async () => {
-      const data = await getProducts()
-      const relacionados = currentProductId ? data.filter((item) => item.id !== currentProductId) : data
-      setItems(relacionados)
+      try {
+        const data = await getProducts()
+        const relacionados = currentProductId ? data.filter((item) => item.id !== currentProductId) : data
+        setItems(relacionados)
+      } catch {
+        // El carrusel es un extra: si falla la carga, no se muestra (en vez de dejar un error en la consola)
+        setItems([])
+      }
     }
     fetchItems()
   }, [currentProductId])
