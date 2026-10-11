@@ -2,8 +2,8 @@
 // Lo que quede vacío ('') no se muestra en ningún lado.
 export const contacto = {
   // Solo números, con código de país y sin el 0 ni el 15. Ej: '5491123456789'
-  whatsapp: '',
-  email: '',
+  whatsapp: '5491161559616',
+  email: 'wperaltaarriaga@gmail.com',
   // Usuario de Instagram, sin @
   instagram: 'santelmates'
 }
