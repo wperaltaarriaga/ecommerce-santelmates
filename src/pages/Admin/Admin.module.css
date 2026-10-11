@@ -467,3 +467,44 @@
 .addImageButton:hover {
   border-color: var(--color-muted-light);
 }
+
+/* ---------- Estados de órdenes ---------- */
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filtro {
+  background: none;
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.filtroActivo {
+  background-color: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-white);
+}
+
+.selectorEstado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.selectEstado {
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  background-color: var(--color-white);
+}

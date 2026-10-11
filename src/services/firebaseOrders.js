@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, orderBy, query, runTransaction, where } from 'firebase/firestore'
+import { collection, doc, getDocs, orderBy, query, runTransaction, updateDoc, where } from 'firebase/firestore'
 import { db } from '../firebase/config'
 
 export class SinStockError extends Error {
@@ -55,4 +55,9 @@ export async function getTodasLasOrdenes() {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
   const snapshot = await getDocs(q)
   return snapshot.docs.map(mapearOrden)
+}
+
+// Cambia el estado de una orden (solo admin; las reglas solo dejan tocar este campo)
+export async function actualizarEstadoOrden(id, estado) {
+  await updateDoc(doc(db, 'orders', id), { estado })
 }

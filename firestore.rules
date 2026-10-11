@@ -105,8 +105,12 @@ service cloud.firestore {
       // Cada usuario lee solo sus órdenes; el admin puede leer todas
       allow read: if estaLogueado()
         && (resource.data.userId == request.auth.uid || esAdmin());
-      // Una orden no se edita ni se borra desde el cliente
-      allow update, delete: if false;
+      // Solo el admin puede cambiar el estado de una orden, y nada más que ese campo
+      allow update: if esAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado'])
+        && request.resource.data.estado in ['pendiente', 'enviada', 'entregada', 'cancelada'];
+      // Una orden nunca se borra desde el cliente
+      allow delete: if false;
     }
 
     // Cualquier otra colección queda cerrada por defecto

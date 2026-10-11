@@ -132,3 +132,10 @@
   color: var(--color-white);
   background-color: var(--color-dark);
 }
+
+.headerDerecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}

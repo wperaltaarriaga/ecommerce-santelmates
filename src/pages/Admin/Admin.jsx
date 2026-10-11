@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { getProducts, updateProducto, crearProducto, eliminarProducto } from '../../services/firebaseProducts'
-import { getTodasLasOrdenes } from '../../services/firebaseOrders'
+import { getTodasLasOrdenes, actualizarEstadoOrden } from '../../services/firebaseOrders'
+import { ESTADOS_ORDEN, estadoDe } from '../../data/estadosOrden'
+import EstadoOrden from '../../components/EstadoOrden/EstadoOrden.jsx'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
 import ProductoForm from './ProductoForm.jsx'
 import styles from './Admin.module.css'
@@ -198,10 +200,48 @@ function TabProductos() {
   )
 }
 
+// Selector de estado de una orden: guarda apenas se elige una opción
+function SelectorEstado({ orden, onCambio }) {
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState(false)
+
+  const cambiar = async (event) => {
+    const estado = event.target.value
+    setGuardando(true)
+    setError(false)
+    try {
+      await actualizarEstadoOrden(orden.id, estado)
+      onCambio({ ...orden, estado })
+    } catch {
+      setError(true)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  return (
+    <div className={styles.selectorEstado}>
+      <EstadoOrden orden={orden} />
+      <label className={styles.srOnly} htmlFor={`estado-${orden.id}`}>Estado de la orden {orden.id}</label>
+      <select
+        id={`estado-${orden.id}`}
+        className={styles.selectEstado}
+        value={estadoDe(orden)}
+        onChange={cambiar}
+        disabled={guardando}
+      >
+        {ESTADOS_ORDEN.map((e) => <option key={e.valor} value={e.valor}>{e.etiqueta}</option>)}
+      </select>
+      {error && <span className={styles.errorMini}>No se pudo guardar</span>}
+    </div>
+  )
+}
+
 function TabOrdenes() {
   const [ordenes, setOrdenes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [filtro, setFiltro] = useState('todas')
 
   useEffect(() => {
     getTodasLasOrdenes()
@@ -214,7 +254,16 @@ function TabOrdenes() {
   if (error) return <p className={styles.error}>{error}</p>
   if (ordenes.length === 0) return <p className={styles.vacio}>Todavía no hay órdenes.</p>
 
-  const totalVendido = ordenes.reduce((acc, o) => acc + o.total, 0)
+  const actualizarOrden = (actualizada) => {
+    setOrdenes((prev) => prev.map((o) => (o.id === actualizada.id ? actualizada : o)))
+  }
+
+  // Las canceladas no cuentan como venta
+  const totalVendido = ordenes
+    .filter((o) => estadoDe(o) !== 'cancelada')
+    .reduce((acc, o) => acc + o.total, 0)
+  const pendientes = ordenes.filter((o) => estadoDe(o) === 'pendiente').length
+  const ordenesVisibles = filtro === 'todas' ? ordenes : ordenes.filter((o) => estadoDe(o) === filtro)
 
   return (
     <>
@@ -224,9 +273,26 @@ function TabOrdenes() {
           <span className={styles.datoLabel}>órdenes</span>
         </div>
         <div className={styles.dato}>
-          <span className={styles.datoValor}>${totalVendido.toLocaleString('es-AR')}</span>
-          <span className={styles.datoLabel}>vendido en total</span>
+          <span className={styles.datoValor}>{pendientes}</span>
+          <span className={styles.datoLabel}>pendientes de envío</span>
         </div>
+        <div className={styles.dato}>
+          <span className={styles.datoValor}>${totalVendido.toLocaleString('es-AR')}</span>
+          <span className={styles.datoLabel}>vendido (sin canceladas)</span>
+        </div>
+      </div>
+
+      <div className={styles.filtros} role="group" aria-label="Filtrar por estado">
+        {[{ valor: 'todas', etiqueta: 'Todas' }, ...ESTADOS_ORDEN].map((e) => (
+          <button
+            key={e.valor}
+            className={`${styles.filtro} ${filtro === e.valor ? styles.filtroActivo : ''}`}
+            onClick={() => setFiltro(e.valor)}
+            aria-pressed={filtro === e.valor}
+          >
+            {e.etiqueta}
+          </button>
+        ))}
       </div>
 
       <div className={styles.tableWrapper}>
@@ -237,10 +303,14 @@ function TabOrdenes() {
               <th>Cliente</th>
               <th>Productos</th>
               <th>Total</th>
+              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
-            {ordenes.map((orden) => (
+            {ordenesVisibles.length === 0 && (
+              <tr><td colSpan={5} className={styles.vacio}>No hay órdenes con este estado.</td></tr>
+            )}
+            {ordenesVisibles.map((orden) => (
               <tr key={orden.id}>
                 <td>{orden.createdAt?.toLocaleDateString('es-AR') ?? '-'}</td>
                 <td>
@@ -254,6 +324,7 @@ function TabOrdenes() {
                   ))}
                 </td>
                 <td className={styles.totalCelda}>${orden.total.toLocaleString('es-AR')}</td>
+                <td><SelectorEstado orden={orden} onCambio={actualizarOrden} /></td>
               </tr>
             ))}
           </tbody>

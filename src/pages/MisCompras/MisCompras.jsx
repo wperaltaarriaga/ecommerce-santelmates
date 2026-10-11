@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { getOrdenesDeUsuario } from '../../services/firebaseOrders'
 import EmptyState from '../../components/EmptyState/EmptyState.jsx'
+import EstadoOrden from '../../components/EstadoOrden/EstadoOrden.jsx'
 import styles from './MisCompras.module.css'
 import { useTituloPagina } from '../../hooks/useTituloPagina'
 
@@ -80,7 +81,10 @@ function MisCompras() {
                 <p className={styles.fecha}>{formatearFecha(orden.createdAt)}</p>
                 <p className={styles.ordenId}>Orden {orden.id}</p>
               </div>
-              <p className={styles.total}>${orden.total.toLocaleString('es-AR')}</p>
+              <div className={styles.headerDerecha}>
+                <EstadoOrden orden={orden} />
+                <p className={styles.total}>${orden.total.toLocaleString('es-AR')}</p>
+              </div>
             </header>
 
             <ul className={styles.items}>
