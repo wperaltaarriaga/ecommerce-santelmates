@@ -8,6 +8,11 @@
     <meta name="description" content="Mates, bombillas y accesorios artesanales. Elegí el tuyo y recibilo en tu casa." />
     <meta name="theme-color" content="#ffffff" />
 
+    <!-- Precarga de la foto del hero: el navegador la empieza a bajar junto con el HTML,
+         sin esperar a que cargue React. Mismo corte (640px) que en Home.module.css. -->
+    <link rel="preload" as="image" type="image/avif" href="/hero/hero-800.avif" media="(max-width: 640px)" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/avif" href="/hero/hero-1600.avif" media="(min-width: 641px)" fetchpriority="high" />
+
     <!-- Vista previa al compartir el link (WhatsApp, Instagram, Facebook) -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_AR" />

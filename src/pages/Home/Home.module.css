@@ -11,9 +11,13 @@
   padding: 56px 48px;
   display: flex;
   align-items: flex-start;
-  background-image:
-    linear-gradient(180deg, rgba(20, 28, 18, 0.55) 0%, rgba(20, 28, 18, 0.15) 45%, rgba(20, 28, 18, 0) 70%),
-    url('https://i.ibb.co/r2YszWv6/DSC-0298.jpg');
+  /* Foto optimizada y servida desde la propia tienda (public/hero), precargada en index.html.
+     Primero el JPG para navegadores viejos; los modernos usan el image-set con AVIF (pesa ~2,5 veces menos).
+     Original en alta: fotos-originales/hero/DSC_0298.jpg (no se sube a git). */
+  --degradado: linear-gradient(180deg, rgba(20, 28, 18, 0.55) 0%, rgba(20, 28, 18, 0.15) 45%, rgba(20, 28, 18, 0) 70%);
+  background-color: var(--color-yerba-claro); /* se ve este color mientras llega la foto */
+  background-image: var(--degradado), url('/hero/hero-1600.jpg');
+  background-image: var(--degradado), image-set(url('/hero/hero-1600.avif') type('image/avif'), url('/hero/hero-1600.jpg') type('image/jpeg'));
   background-size: cover;
   background-position: center;
 }
@@ -202,6 +206,9 @@
   .hero {
     min-height: 70vh;
     padding: 36px 20px;
+    /* En el celular, la versión de 800px (60 KB en AVIF) */
+    background-image: var(--degradado), url('/hero/hero-800.jpg');
+    background-image: var(--degradado), image-set(url('/hero/hero-800.avif') type('image/avif'), url('/hero/hero-800.jpg') type('image/jpeg'));
   }
 
   .heroBoton {
